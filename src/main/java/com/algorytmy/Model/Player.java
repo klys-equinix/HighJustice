@@ -15,12 +15,10 @@ import javax.validation.constraints.NotNull;
 @Table(name = "players")
 public class Player {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @NotNull
     private Integer score;
+
+    @Id
     @NotNull
     private String name;
 
