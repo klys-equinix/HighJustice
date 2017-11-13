@@ -13,20 +13,20 @@ import java.util.ArrayList;
 public class GameService {
 
     @Autowired
-    GameInfoRepository gameInfoRepository;
+    MatchResultRepository matchResultRepository;
 
     @Autowired
     ArrayList<PlayerExecutable> playerExecutables;
 
-    private Game currentGame;
+    private Match currentMatch;
 
 
     /**
      * Create game for GUI mode - you are expected to call nextMove to progress the game.
      * @return
      */
-    public Game createGame(Game possibleGame) {
-        return currentGame;
+    public Match createGame(Match possibleMatch) {
+        return currentMatch;
     }
 
     /**
@@ -46,7 +46,7 @@ public class GameService {
     }
 
 
-    public Game getCurrentGame() {
-        return currentGame;
+    public Match getCurrentMatch() {
+        return currentMatch;
     }
 }

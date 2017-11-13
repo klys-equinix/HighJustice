@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Data
 @Table(name = "games")
-public class GameInfo {
+public class MatchResult {
 
     public enum GAME_ENDER {
             WRONG_INSERTION, TIMEOUT, DEFAULT

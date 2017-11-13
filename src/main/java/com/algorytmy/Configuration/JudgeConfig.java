@@ -1,7 +1,7 @@
 package com.algorytmy.Configuration;
 
 
-import com.algorytmy.Model.Game;
+import com.algorytmy.Model.Match;
 import com.algorytmy.Model.PlayerExecutable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +19,7 @@ public class JudgeConfig {
     }
 
     @Bean
-    public ArrayList<Game> possibleGames() {
-        return new ArrayList<Game>();
+    public ArrayList<Match> possibleGames() {
+        return new ArrayList<Match>();
     }
 }

@@ -1,6 +1,6 @@
 package com.algorytmy.Services;
 
-import com.algorytmy.Model.Game;
+import com.algorytmy.Model.Match;
 import com.algorytmy.Model.PlayerExecutable;
 import com.algorytmy.Model.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class LoaderService {
     private ArrayList<PlayerExecutable> playerExecutables;
 
     @Autowired
-    private ArrayList<Game> possibleGames;
+    private ArrayList<Match> possibleMatches;
 
     public void loadPlayers(File playersFolder) {
 

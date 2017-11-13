@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
  * Created by Konrad Łyś on 06.11.2017 for usage in judge.
  */
 @Repository
-public interface GameInfoRepository extends JpaRepository<GameInfo, Long> {
-    GameInfo findByWinner_Name(String name);
+public interface MatchResultRepository extends JpaRepository<MatchResult, Long> {
+    MatchResult findByWinner_Name(String name);
 }

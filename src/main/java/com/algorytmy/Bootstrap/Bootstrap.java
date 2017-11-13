@@ -15,7 +15,7 @@ import javax.annotation.PostConstruct;
 public class Bootstrap {
     final Logger logger = LoggerFactory.getLogger(Bootstrap.class);
     @Autowired
-    GameInfoRepository gameInfoRepository;
+    MatchResultRepository matchResultRepository;
 
     @Autowired
     PlayerRepository playerRepository;
@@ -27,14 +27,14 @@ public class Bootstrap {
         Player player2 = new Player("Szymon", 0);
         playerRepository.save(player1);
         playerRepository.save(player2);
-        GameInfo gameInfo = new GameInfo();
-        gameInfo.setWinner(player1);
-        gameInfo.setLoser(player2);
-        gameInfo.setGameEnder(GameInfo.GAME_ENDER.DEFAULT);
-        gameInfoRepository.save(gameInfo);
+        MatchResult matchResult = new MatchResult();
+        matchResult.setWinner(player1);
+        matchResult.setLoser(player2);
+        matchResult.setGameEnder(MatchResult.GAME_ENDER.DEFAULT);
+        matchResultRepository.save(matchResult);
 
-        logger.info(gameInfoRepository.findAll().get(0).toString());
+        logger.info(matchResultRepository.findAll().get(0).toString());
         logger.info(playerRepository.findAll().get(0).toString());
-        logger.info(gameInfoRepository.findByWinner_Name("Konrad").toString());
+        logger.info(matchResultRepository.findByWinner_Name("Konrad").toString());
     }
 }
