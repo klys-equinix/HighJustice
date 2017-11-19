@@ -1,16 +1,46 @@
 package com.algorytmy;
 
+import com.algorytmy.Exceptions.ExecutionExcepetion;
+import com.algorytmy.Model.Match;
+import com.algorytmy.Services.GameService;
+import com.algorytmy.Services.LoaderService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class JudgeApplicationTests {
 
-	@Test
-	public void contextLoads() {
-	}
+    @Autowired
+    LoaderService loaderService;
+
+    @Autowired
+    GameService gameService;
+
+    @Value(value = "classpath:Players")
+    private Resource playersFolder;
+
+    @Autowired
+    private ArrayList<Match> possibleMatches;
+
+    /*
+    I know it is not a valid unit test, just leave it be
+     */
+    @Test
+    public void canRunBasicGame() throws IOException, ExecutionExcepetion {
+        loaderService.loadPlayers(playersFolder.getFile());
+        gameService.createGame(possibleMatches.get(0));
+        while(gameService.nextMove() != null) {}
+        gameService.getCurrentMatch().toString();
+        gameService.endMatch();
+    }
 
 }

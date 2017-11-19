@@ -5,12 +5,13 @@ import com.algorytmy.Model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.*;
 import java.util.stream.IntStream;
 
 /**
@@ -60,7 +61,7 @@ public class GameService {
             throw new ExecutionExcepetion("Cannot run player executable", otherPlayer);
         }
         Integer boardSize = IntStream.generate(() -> ThreadLocalRandom.current().nextInt(100, 999)).filter(n -> n % 2 == 1).limit(1).boxed().toArray(Integer[]::new)[0];
-        possibleMatch.setBoard(new Match.FIELD_VALUE[boardSize][boardSize]);
+        possibleMatch.createBoard(boardSize);
         try {
             if (!writeAndRead(boardSize.toString(), currentPlayer).equals("OK"))
                 throw new IOException();
@@ -97,7 +98,7 @@ public class GameService {
      */
     public Move nextMove() {
         if (isFirstMove) {
-            isFirstMove = false;
+            this.isFirstMove = false;
             try {
                 Move firstMove = validateMove(new Move(writeAndRead("start", currentPlayer),
                         currentPlayer));
@@ -106,7 +107,7 @@ public class GameService {
                     lastValidMove = firstMove;
                 }
                 return firstMove;
-            } catch (IOException e) {
+            } catch (IOException | ExecutionExcepetion e) {
                 logger.error(e.getMessage());
                 MatchResult matchResult = new MatchResult(otherPlayer, currentPlayer, MatchResult.GAME_ENDER.TIMEOUT);
                 currentMatch.setMatchResult(matchResult);
@@ -121,7 +122,7 @@ public class GameService {
                 lastValidMove = move;
             }
             return move;
-        } catch (IOException e) {
+        } catch (IOException | ExecutionExcepetion e) {
             logger.error(e.getMessage());
             MatchResult matchResult = new MatchResult(otherPlayer, currentPlayer, MatchResult.GAME_ENDER.TIMEOUT);
             currentMatch.setMatchResult(matchResult);
@@ -130,12 +131,8 @@ public class GameService {
     }
 
     public void endMatch() {
-        try {
-            writeAndRead("stop", currentPlayer);
-            writeAndRead("stop", otherPlayer);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+        currentPlayer.getPlayerExecutable().getWriter().println("stop");
+        otherPlayer.getPlayerExecutable().getWriter().println("stop");
         MatchResult matchResult = currentMatch.getMatchResult();
         matchResultRepository.save(matchResult);
         currentMatch = null;
@@ -152,10 +149,12 @@ public class GameService {
                 move.getX2() < currentMatch.getBoard()[0].length && move.getX2() > 0 &&
                 move.getY2() < currentMatch.getBoard().length && move.getY2() > 0) {
             if(currentMatch.getBoard()[move.getX1()][move.getY1()].equals(Match.FIELD_VALUE.EMPTY) &&
-                    currentMatch.getBoard()[move.getX2()][move.getY2()] == Match.FIELD_VALUE.EMPTY) {
+                    currentMatch.getBoard()[move.getX2()][move.getY2()].equals(Match.FIELD_VALUE.EMPTY)) {
                 Match.FIELD_VALUE[][] board = currentMatch.getBoard();
                 board[move.getX1()][move.getY1()] = currentPlayer.getPlayerSignature();
                 board[move.getX2()][move.getY2()] = currentPlayer.getPlayerSignature();
+                currentMatch.setBoard(board);
+                logger.info(move.toString());
                 return move;
             }
         }
@@ -166,34 +165,26 @@ public class GameService {
 
     private void initiateProcess(PlayerExecutable playerExecutable) throws IOException {
         playerExecutable.setProcess(Runtime.getRuntime().exec(playerExecutable.getCommandLineExecution()));
-        playerExecutable.setWriter(new BufferedWriter(new OutputStreamWriter(playerExecutable.getProcess().getOutputStream())));
-        playerExecutable.setReader(new BufferedReader(new InputStreamReader(playerExecutable.getProcess().getInputStream())));
+        playerExecutable.setWriter(new PrintWriter(playerExecutable.getProcess().getOutputStream()));
     }
 
-    private String writeAndRead(String message, Player player) throws IOException {
-        Long time = System.nanoTime();
-        player.getPlayerExecutable().getWriter().write(message);
+    private String writeAndRead(String message, Player player) throws IOException, ExecutionExcepetion {
+        player.getPlayerExecutable().getWriter().println(message);
         player.getPlayerExecutable().getWriter().flush();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            logger.error(e.getMessage());
-        }
-        Scanner scanner = new Scanner(player.getPlayerExecutable().getReader());
         String line = "";
-        while(scanner.hasNextLine()) {
-            line = scanner.nextLine();
+        Scanner scanner = new Scanner(player.getPlayerExecutable().getProcess().getInputStream());
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Future<String> future = executor.submit(() -> scanner.nextLine());
+        try {
+            line = future.get(1000, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e1) {
+            throw new ExecutionExcepetion("Read timeout", player);
         }
         return line;
     }
 
     private void closePlayerProcess(Player player) {
-        try {
-            player.getPlayerExecutable().getReader().close();
-            player.getPlayerExecutable().getWriter().close();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+        player.getPlayerExecutable().getWriter().close();
         player.getPlayerExecutable().getProcess().destroy();
     }
 
