@@ -10,11 +10,12 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 @Data
+@NoArgsConstructor
 @Table(name = "games")
 public class MatchResult {
 
     public enum GAME_ENDER {
-            WRONG_INSERTION, TIMEOUT, DEFAULT
+            WRONG_INSERTION, TIMEOUT, DEFAULT, CANNOT_EXECUTE
     }
 
     @Id
@@ -31,4 +32,10 @@ public class MatchResult {
 
     @NotNull
     private GAME_ENDER gameEnder;
+
+    public MatchResult(Player winner, Player loser, GAME_ENDER gameEnder) {
+        this.winner = winner;
+        this.loser = loser;
+        this.gameEnder = gameEnder;
+    }
 }

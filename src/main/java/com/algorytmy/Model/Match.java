@@ -11,7 +11,10 @@ import java.util.ArrayList;
 @Data
 @NoArgsConstructor
 public class Match {
-    private Integer[][] board;
+    public enum FIELD_VALUE {
+        P1, P2, EMPTY, OBSTACLE
+    }
+    private FIELD_VALUE[][] board;
     private ArrayList<Move> player1Moves;
     private ArrayList<Move> player2Moves;
     private Player player1;
@@ -20,6 +23,6 @@ public class Match {
     public Match(Player player1, Player player2, int boardSize) {
         this.player1 = player1;
         this.player2 = player2;
-        this.board = new Integer[boardSize][boardSize];
+        this.board = new FIELD_VALUE[boardSize][boardSize];
     }
 }
