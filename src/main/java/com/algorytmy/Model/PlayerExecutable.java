@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.PrintWriter;
 
 
 /**
@@ -16,8 +17,6 @@ import java.io.BufferedWriter;
 @NoArgsConstructor
 public class PlayerExecutable {
     private String commandLineExecution;
-    private String executablePath;
     private Process process;
-    private BufferedWriter writer;
-    private BufferedReader reader;
+    private PrintWriter writer;
 }

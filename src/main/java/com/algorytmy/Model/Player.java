@@ -2,6 +2,7 @@ package com.algorytmy.Model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.context.annotation.Configuration;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -16,10 +17,10 @@ import javax.validation.constraints.NotNull;
 public class Player {
 
     @NotNull
-    private Integer score;
+    private Integer score = 0;
 
     @Id
-    @NotNull
+    @Column(unique = true)
     private String name;
 
     @Transient
