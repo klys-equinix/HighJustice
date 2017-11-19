@@ -1,6 +1,6 @@
 package com.algorytmy.Services;
 
-import com.algorytmy.Exceptions.ExecutionExcpetion;
+import com.algorytmy.Exceptions.ExecutionExcepetion;
 import com.algorytmy.Model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
@@ -40,7 +41,7 @@ public class GameService {
      * @return new Match with created Board
      * @throws IOException if one of the players cannot be executed
      */
-    public Match createGame(Match possibleMatch) throws ExecutionExcpetion {
+    public Match createGame(Match possibleMatch) throws ExecutionExcepetion {
         this.currentMatch = possibleMatch;
         currentPlayer = executablePlayers.get(possibleMatch.getPlayer1().getName());
         otherPlayer = executablePlayers.get(possibleMatch.getPlayer2().getName());
@@ -49,32 +50,32 @@ public class GameService {
         } catch (IOException e) {
             MatchResult matchResult = new MatchResult(possibleMatch.getPlayer2(), possibleMatch.getPlayer1(), MatchResult.GAME_ENDER.CANNOT_EXECUTE);
             currentMatch.setMatchResult(matchResult);
-            throw new ExecutionExcpetion("Cannot run player executable", currentPlayer);
+            throw new ExecutionExcepetion("Cannot run player executable", currentPlayer);
         }
         try {
             initiateProcess(otherPlayer.getPlayerExecutable());
         } catch (IOException e) {
             MatchResult matchResult = new MatchResult(possibleMatch.getPlayer1(), possibleMatch.getPlayer2(), MatchResult.GAME_ENDER.CANNOT_EXECUTE);
             currentMatch.setMatchResult(matchResult);
-            throw new ExecutionExcpetion("Cannot run player executable", otherPlayer);
+            throw new ExecutionExcepetion("Cannot run player executable", otherPlayer);
         }
         Integer boardSize = IntStream.generate(() -> ThreadLocalRandom.current().nextInt(100, 999)).filter(n -> n % 2 == 1).limit(1).boxed().toArray(Integer[]::new)[0];
         possibleMatch.setBoard(new Match.FIELD_VALUE[boardSize][boardSize]);
         try {
-            if (!writeAndRead(boardSize.toString(), currentPlayer.getPlayerExecutable().getWriter(), currentPlayer.getPlayerExecutable().getReader()).equals("OK"))
+            if (!writeAndRead(boardSize.toString(), currentPlayer).equals("OK"))
                 throw new IOException();
         } catch (IOException e) {
             MatchResult matchResult = new MatchResult(possibleMatch.getPlayer2(), possibleMatch.getPlayer1(), MatchResult.GAME_ENDER.TIMEOUT);
             currentMatch.setMatchResult(matchResult);
-            throw new ExecutionExcpetion("Player1 not responding", currentPlayer);
+            throw new ExecutionExcepetion("Player1 not responding", currentPlayer);
         }
         try {
-            if (!writeAndRead(boardSize.toString(), otherPlayer.getPlayerExecutable().getWriter(), otherPlayer.getPlayerExecutable().getReader()).equals("OK"))
+            if (!writeAndRead(boardSize.toString(), otherPlayer).equals("OK"))
                 throw new IOException();
         } catch (IOException e) {
             MatchResult matchResult = new MatchResult(possibleMatch.getPlayer1(), possibleMatch.getPlayer2(), MatchResult.GAME_ENDER.TIMEOUT);
             currentMatch.setMatchResult(matchResult);
-            throw new ExecutionExcpetion("Player2 not responding", otherPlayer);
+            throw new ExecutionExcepetion("Player2 not responding", otherPlayer);
         }
         currentPlayer.setPlayerSignature(Match.FIELD_VALUE.P1);
         otherPlayer.setPlayerSignature(Match.FIELD_VALUE.P2);
@@ -98,7 +99,7 @@ public class GameService {
         if (isFirstMove) {
             isFirstMove = false;
             try {
-                Move firstMove = validateMove(new Move(writeAndRead("start", currentPlayer.getPlayerExecutable().getWriter(), currentPlayer.getPlayerExecutable().getReader()),
+                Move firstMove = validateMove(new Move(writeAndRead("start", currentPlayer),
                         currentPlayer));
                 if(firstMove != null) {
                     switchPlayers();
@@ -113,7 +114,7 @@ public class GameService {
             }
         }
         try {
-            Move move = validateMove(new Move(writeAndRead(lastValidMove.toString(), currentPlayer.getPlayerExecutable().getWriter(), currentPlayer.getPlayerExecutable().getReader()),
+            Move move = validateMove(new Move(writeAndRead(lastValidMove.toString(), currentPlayer),
                     currentPlayer));
             if(move != null) {
                 switchPlayers();
@@ -130,8 +131,8 @@ public class GameService {
 
     public void endMatch() {
         try {
-            writeAndRead("stop", currentPlayer.getPlayerExecutable().getWriter(), currentPlayer.getPlayerExecutable().getReader());
-            writeAndRead("stop", otherPlayer.getPlayerExecutable().getWriter(), otherPlayer.getPlayerExecutable().getReader());
+            writeAndRead("stop", currentPlayer);
+            writeAndRead("stop", otherPlayer);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -169,17 +170,20 @@ public class GameService {
         playerExecutable.setReader(new BufferedReader(new InputStreamReader(playerExecutable.getProcess().getInputStream())));
     }
 
-    private String writeAndRead(String message, BufferedWriter writer, BufferedReader reader) throws IOException {
+    private String writeAndRead(String message, Player player) throws IOException {
         Long time = System.nanoTime();
-        writer.write(message);
-        writer.flush();
+        player.getPlayerExecutable().getWriter().write(message);
+        player.getPlayerExecutable().getWriter().flush();
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             logger.error(e.getMessage());
         }
-        String line;
-        while ((line = reader.readLine()) != null) ; // skip to last line, probably will have to change to WatchService
+        Scanner scanner = new Scanner(player.getPlayerExecutable().getReader());
+        String line = "";
+        while(scanner.hasNextLine()) {
+            line = scanner.nextLine();
+        }
         return line;
     }
 
