@@ -17,7 +17,6 @@ import java.io.BufferedWriter;
 public class PlayerExecutable {
     private String commandLineExecution;
     private String executablePath;
-    private String name;
     private Process process;
     private BufferedWriter writer;
     private BufferedReader reader;

@@ -3,8 +3,6 @@ package com.algorytmy.Model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.persistence.criteria.CriteriaBuilder;
-
 /**
  * Created by Konrad Łyś on 06.11.2017 for usage in judge.
  */

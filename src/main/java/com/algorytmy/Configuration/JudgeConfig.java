@@ -2,7 +2,7 @@ package com.algorytmy.Configuration;
 
 
 import com.algorytmy.Model.Match;
-import com.algorytmy.Model.PlayerExecutable;
+import com.algorytmy.Model.Player;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,7 +16,7 @@ import java.util.Map;
 @Configuration
 public class JudgeConfig {
     @Bean
-    public Map<String, PlayerExecutable> playerExecutables() {
+    public Map<String, Player> executablePlayers() {
         return new HashMap<>();
     }
 

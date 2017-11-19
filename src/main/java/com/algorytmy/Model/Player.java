@@ -22,8 +22,18 @@ public class Player {
     @NotNull
     private String name;
 
+    @Transient
+    PlayerExecutable playerExecutable;
+
+    @Transient
+    Match.FIELD_VALUE playerSignature;
+
     public Player(String name, Integer score) {
         this.score = score;
         this.name = name;
+    }
+
+    public void addToScore() {
+        this.score += 1;
     }
 }

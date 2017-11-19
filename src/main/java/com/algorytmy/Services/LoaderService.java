@@ -1,6 +1,7 @@
 package com.algorytmy.Services;
 
 import com.algorytmy.Model.Match;
+import com.algorytmy.Model.Player;
 import com.algorytmy.Model.PlayerExecutable;
 import com.algorytmy.Model.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by Konrad Łyś on 13.11.2017 for usage in judge.
@@ -20,7 +22,7 @@ public class LoaderService {
     PlayerRepository playerRepository;
 
     @Autowired
-    private ArrayList<PlayerExecutable> playerExecutables;
+    private Map<String, Player> playerExecutables;
 
     @Autowired
     private ArrayList<Match> possibleMatches;
