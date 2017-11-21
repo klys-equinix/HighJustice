@@ -9,6 +9,8 @@ import org.springframework.core.NestedExceptionUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.*;
@@ -20,6 +22,8 @@ import java.util.stream.IntStream;
 @Service
 public class GameService {
     final Logger logger = LoggerFactory.getLogger(GameService.class);
+
+    private List<MatchEndListener> matchEndListeners = new ArrayList<>();
 
     @Autowired
     MatchResultRepository matchResultRepository;
@@ -49,15 +53,13 @@ public class GameService {
         try {
             initiateProcess(currentPlayer.getPlayerExecutable());
         } catch (IOException e) {
-            MatchResult matchResult = new MatchResult(possibleMatch.getPlayer2(), possibleMatch.getPlayer1(), MatchResult.GAME_ENDER.CANNOT_EXECUTE);
-            currentMatch.setMatchResult(matchResult);
+            finalizeMatch(possibleMatch.getPlayer2(), possibleMatch.getPlayer1(), MatchResult.GAME_ENDER.CANNOT_EXECUTE);
             throw new ExecutionExcepetion("Cannot run player executable", currentPlayer);
         }
         try {
             initiateProcess(otherPlayer.getPlayerExecutable());
         } catch (IOException e) {
-            MatchResult matchResult = new MatchResult(possibleMatch.getPlayer1(), possibleMatch.getPlayer2(), MatchResult.GAME_ENDER.CANNOT_EXECUTE);
-            currentMatch.setMatchResult(matchResult);
+            finalizeMatch(possibleMatch.getPlayer1(), possibleMatch.getPlayer2(), MatchResult.GAME_ENDER.CANNOT_EXECUTE);
             throw new ExecutionExcepetion("Cannot run player executable", otherPlayer);
         }
         Integer boardSize = IntStream.generate(() -> ThreadLocalRandom.current().nextInt(100, 999)).filter(n -> n % 2 == 1).limit(1).boxed().toArray(Integer[]::new)[0];
@@ -66,16 +68,14 @@ public class GameService {
             if (!writeAndRead(boardSize.toString(), currentPlayer).equals("OK"))
                 throw new IOException();
         } catch (IOException e) {
-            MatchResult matchResult = new MatchResult(possibleMatch.getPlayer2(), possibleMatch.getPlayer1(), MatchResult.GAME_ENDER.TIMEOUT);
-            currentMatch.setMatchResult(matchResult);
+            finalizeMatch(possibleMatch.getPlayer2(), possibleMatch.getPlayer1(), MatchResult.GAME_ENDER.TIMEOUT);
             throw new ExecutionExcepetion("Player1 not responding", currentPlayer);
         }
         try {
             if (!writeAndRead(boardSize.toString(), otherPlayer).equals("OK"))
                 throw new IOException();
         } catch (IOException e) {
-            MatchResult matchResult = new MatchResult(possibleMatch.getPlayer1(), possibleMatch.getPlayer2(), MatchResult.GAME_ENDER.TIMEOUT);
-            currentMatch.setMatchResult(matchResult);
+            finalizeMatch(possibleMatch.getPlayer1(), possibleMatch.getPlayer2(), MatchResult.GAME_ENDER.TIMEOUT);
             throw new ExecutionExcepetion("Player2 not responding", otherPlayer);
         }
         currentPlayer.setPlayerSignature(Match.FIELD_VALUE.P1);
@@ -109,8 +109,7 @@ public class GameService {
                 return firstMove;
             } catch (IOException | ExecutionExcepetion e) {
                 logger.error(e.getMessage());
-                MatchResult matchResult = new MatchResult(otherPlayer, currentPlayer, MatchResult.GAME_ENDER.TIMEOUT);
-                currentMatch.setMatchResult(matchResult);
+                finalizeMatch(otherPlayer, currentPlayer, MatchResult.GAME_ENDER.TIMEOUT);
                 return null;
             }
         }
@@ -124,8 +123,7 @@ public class GameService {
             return move;
         } catch (IOException | ExecutionExcepetion e) {
             logger.error(e.getMessage());
-            MatchResult matchResult = new MatchResult(otherPlayer, currentPlayer, MatchResult.GAME_ENDER.TIMEOUT);
-            currentMatch.setMatchResult(matchResult);
+            finalizeMatch(otherPlayer, currentPlayer, MatchResult.GAME_ENDER.TIMEOUT);
             return null;
         }
     }
@@ -143,6 +141,12 @@ public class GameService {
         closePlayerProcess(otherPlayer);
     }
 
+    private void finalizeMatch(Player winner, Player loser, MatchResult.GAME_ENDER gameEnder) {
+        MatchResult matchResult = new MatchResult(winner, loser, gameEnder);
+        currentMatch.setMatchResult(matchResult);
+        matchEndListeners.forEach((matchEndListener -> matchEndListener.gameEnded()));
+    }
+
     private Move validateMove(Move move) {
         if (move.getX1() < currentMatch.getBoard()[0].length && move.getX1() > 0 &&
                 move.getY1() < currentMatch.getBoard().length && move.getY1() > 0 &&
@@ -158,8 +162,7 @@ public class GameService {
                 return move;
             }
         }
-        MatchResult matchResult = new MatchResult(otherPlayer, currentPlayer, MatchResult.GAME_ENDER.WRONG_INSERTION);
-        currentMatch.setMatchResult(matchResult);
+        finalizeMatch(otherPlayer, currentPlayer, MatchResult.GAME_ENDER.WRONG_INSERTION);
         return null;
     }
 
@@ -197,5 +200,7 @@ public class GameService {
     public Match getCurrentMatch() {
         return currentMatch;
     }
+
+    public void addMathEndListener(MatchEndListener matchEndListener) {this.matchEndListeners.add(matchEndListener);}
 
 }
