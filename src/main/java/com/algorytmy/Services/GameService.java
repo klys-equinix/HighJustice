@@ -144,7 +144,7 @@ public class GameService {
     private void finalizeMatch(Player winner, Player loser, MatchResult.GAME_ENDER gameEnder) {
         MatchResult matchResult = new MatchResult(winner, loser, gameEnder);
         currentMatch.setMatchResult(matchResult);
-        matchEndListeners.forEach((matchEndListener -> matchEndListener.gameEnded()));
+        matchEndListeners.forEach((matchEndListener -> matchEndListener.matchEnded(currentMatch)));
     }
 
     private Move validateMove(Move move) {
