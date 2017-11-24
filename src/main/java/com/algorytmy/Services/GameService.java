@@ -23,16 +23,11 @@ import java.util.stream.IntStream;
 public class GameService {
     final Logger logger = LoggerFactory.getLogger(GameService.class);
 
-    private List<MatchEndListener> matchEndListeners = new ArrayList<>();
-
     @Autowired
     MatchResultRepository matchResultRepository;
 
     @Autowired
     PlayerRepository playerRepository;
-
-    @Autowired
-    Map<String, Player> executablePlayers;
 
     private Match currentMatch;
     private Player currentPlayer;
@@ -48,8 +43,8 @@ public class GameService {
      */
     public Match createGame(Match possibleMatch) throws ExecutionExcepetion {
         this.currentMatch = possibleMatch;
-        currentPlayer = executablePlayers.get(possibleMatch.getPlayer1().getName());
-        otherPlayer = executablePlayers.get(possibleMatch.getPlayer2().getName());
+        currentPlayer = possibleMatch.getPlayer1();
+        otherPlayer = possibleMatch.getPlayer2();
         try {
             initiateProcess(currentPlayer.getPlayerExecutable());
         } catch (IOException e) {
@@ -84,14 +79,6 @@ public class GameService {
     }
 
     /**
-     * Call this for automatic mode - all games will be run concurrently, without communicating with GUI.
-     * Only final statistics are to be displayed.
-     */
-    public void runAllGames() {
-
-    }
-
-    /**
      * If this returns null, it means the game has ended
      *
      * @return
@@ -112,6 +99,10 @@ public class GameService {
                 finalizeMatch(otherPlayer, currentPlayer, MatchResult.GAME_ENDER.TIMEOUT);
                 return null;
             }
+        }
+        if(noFreeSpaceLeft()) {
+            finalizeMatch(otherPlayer, currentPlayer, MatchResult.GAME_ENDER.DEFAULT);
+            return null;
         }
         try {
             Move move = validateMove(new Move(writeAndRead(lastValidMove.toString(), currentPlayer),
@@ -144,7 +135,21 @@ public class GameService {
     private void finalizeMatch(Player winner, Player loser, MatchResult.GAME_ENDER gameEnder) {
         MatchResult matchResult = new MatchResult(winner, loser, gameEnder);
         currentMatch.setMatchResult(matchResult);
-        matchEndListeners.forEach((matchEndListener -> matchEndListener.matchEnded(currentMatch)));
+        currentMatch.getMatchEndListeners().forEach((matchEndListener -> matchEndListener.matchEnded(currentMatch)));
+    }
+
+    private boolean noFreeSpaceLeft() {
+        for(int i = 0; i < currentMatch.getBoard().length; i++) {
+            for(int j = 0; i < currentMatch.getBoard().length; i++) {
+                if(i++ < currentMatch.getBoard().length && currentMatch.getBoard()[i][j].equals(Match.FIELD_VALUE.EMPTY) && currentMatch.getBoard()[i++][j].equals(Match.FIELD_VALUE.EMPTY)) {
+                    return false;
+                }
+                if(j++ < currentMatch.getBoard().length && currentMatch.getBoard()[i][j].equals(Match.FIELD_VALUE.EMPTY) && currentMatch.getBoard()[i][j++].equals(Match.FIELD_VALUE.EMPTY)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private Move validateMove(Move move) {
@@ -201,6 +206,5 @@ public class GameService {
         return currentMatch;
     }
 
-    public void addMathEndListener(MatchEndListener matchEndListener) {this.matchEndListeners.add(matchEndListener);}
 
 }
