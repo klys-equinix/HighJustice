@@ -48,6 +48,7 @@ public class GameService {
      */
     public Match createGame(Match possibleMatch) throws ExecutionExcepetion {
         this.currentMatch = possibleMatch;
+        currentMatch.setMatchStatus(MatchStatus.IN_PROGRESS);
         currentPlayer = executablePlayers.get(possibleMatch.getPlayer1().getName());
         otherPlayer = executablePlayers.get(possibleMatch.getPlayer2().getName());
         try {
@@ -143,6 +144,7 @@ public class GameService {
 
     private void finalizeMatch(Player winner, Player loser, MatchResult.GAME_ENDER gameEnder) {
         MatchResult matchResult = new MatchResult(winner, loser, gameEnder);
+        currentMatch.setMatchStatus(MatchStatus.ENDED);
         currentMatch.setMatchResult(matchResult);
         matchEndListeners.forEach((matchEndListener -> matchEndListener.matchEnded(currentMatch)));
     }
