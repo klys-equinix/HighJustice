@@ -2,6 +2,7 @@ package com.algorytmy;
 
 import com.algorytmy.Exceptions.ExecutionExcepetion;
 import com.algorytmy.Model.Match;
+import com.algorytmy.Services.AutoGameRunner;
 import com.algorytmy.Services.GameService;
 import com.algorytmy.Services.LoaderService;
 import org.junit.Test;
@@ -25,6 +26,9 @@ public class JudgeApplicationTests {
     @Autowired
     GameService gameService;
 
+    @Autowired
+    AutoGameRunner autoGameRunner;
+
     @Value(value = "classpath:Players")
     private Resource playersFolder;
 
@@ -37,10 +41,11 @@ public class JudgeApplicationTests {
     @Test
     public void canRunBasicGame() throws IOException, ExecutionExcepetion {
         loaderService.loadPlayers(playersFolder.getFile());
-        gameService.createGame(possibleMatches.get(0));
-        while(gameService.nextMove() != null) {}
-        gameService.getCurrentMatch().toString();
-        gameService.endMatch();
+//        gameService.createGame(possibleMatches.get(0));
+//        while(gameService.nextMove() != null) {}
+//        gameService.getCurrentMatch().toString();
+//        gameService.endMatch();
+        autoGameRunner.runAllGames();
     }
 
 }
