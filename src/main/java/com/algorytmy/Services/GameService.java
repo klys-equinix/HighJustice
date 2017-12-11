@@ -1,17 +1,13 @@
 package com.algorytmy.Services;
 
-import com.algorytmy.Exceptions.ExecutionExcepetion;
+import com.algorytmy.Exceptions.ExecutionException;
 import com.algorytmy.Model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.NestedExceptionUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.*;
 import java.util.stream.IntStream;
@@ -41,7 +37,7 @@ public class GameService {
      * @return new Match with created Board
      * @throws IOException if one of the players cannot be executed
      */
-    public Match createGame(Match possibleMatch) throws ExecutionExcepetion {
+    public Match createGame(Match possibleMatch) throws ExecutionException {
         this.currentMatch = possibleMatch;
         currentPlayer = possibleMatch.getPlayer1();
         otherPlayer = possibleMatch.getPlayer2();
@@ -49,13 +45,13 @@ public class GameService {
             initiateProcess(currentPlayer.getPlayerExecutable());
         } catch (IOException e) {
             finalizeMatch(possibleMatch.getPlayer2(), possibleMatch.getPlayer1(), MatchResult.GAME_ENDER.CANNOT_EXECUTE);
-            throw new ExecutionExcepetion("Cannot run player executable", currentPlayer);
+            throw new ExecutionException("Cannot run player executable", currentPlayer);
         }
         try {
             initiateProcess(otherPlayer.getPlayerExecutable());
         } catch (IOException e) {
             finalizeMatch(possibleMatch.getPlayer1(), possibleMatch.getPlayer2(), MatchResult.GAME_ENDER.CANNOT_EXECUTE);
-            throw new ExecutionExcepetion("Cannot run player executable", otherPlayer);
+            throw new ExecutionException("Cannot run player executable", otherPlayer);
         }
         Integer boardSize = IntStream.generate(() -> ThreadLocalRandom.current().nextInt(100, 999)).filter(n -> n % 2 == 1).limit(1).boxed().toArray(Integer[]::new)[0];
         possibleMatch.createBoard(boardSize);
@@ -64,14 +60,14 @@ public class GameService {
                 throw new IOException();
         } catch (IOException e) {
             finalizeMatch(possibleMatch.getPlayer2(), possibleMatch.getPlayer1(), MatchResult.GAME_ENDER.TIMEOUT);
-            throw new ExecutionExcepetion("Player1 not responding", currentPlayer);
+            throw new ExecutionException("Player1 not responding", currentPlayer);
         }
         try {
             if (!writeAndRead(boardSize.toString(), otherPlayer).equals("OK"))
                 throw new IOException();
         } catch (IOException e) {
             finalizeMatch(possibleMatch.getPlayer1(), possibleMatch.getPlayer2(), MatchResult.GAME_ENDER.TIMEOUT);
-            throw new ExecutionExcepetion("Player2 not responding", otherPlayer);
+            throw new ExecutionException("Player2 not responding", otherPlayer);
         }
         currentPlayer.setPlayerSignature(Match.FIELD_VALUE.P1);
         otherPlayer.setPlayerSignature(Match.FIELD_VALUE.P2);
@@ -94,7 +90,7 @@ public class GameService {
                     lastValidMove = firstMove;
                 }
                 return firstMove;
-            } catch (IOException | ExecutionExcepetion e) {
+            } catch (IOException | ExecutionException e) {
                 logger.error(e.getMessage());
                 finalizeMatch(otherPlayer, currentPlayer, MatchResult.GAME_ENDER.TIMEOUT);
                 return null;
@@ -112,7 +108,7 @@ public class GameService {
                 lastValidMove = move;
             }
             return move;
-        } catch (IOException | ExecutionExcepetion e) {
+        } catch (IOException | ExecutionException e) {
             logger.error(e.getMessage());
             finalizeMatch(otherPlayer, currentPlayer, MatchResult.GAME_ENDER.TIMEOUT);
             return null;
@@ -133,6 +129,7 @@ public class GameService {
     }
 
     private void finalizeMatch(Player winner, Player loser, MatchResult.GAME_ENDER gameEnder) {
+        isFirstMove = true;
         MatchResult matchResult = new MatchResult(winner, loser, gameEnder);
         currentMatch.setMatchResult(matchResult);
         currentMatch.getMatchEndListeners().forEach((matchEndListener -> matchEndListener.matchEnded(currentMatch)));
@@ -176,7 +173,7 @@ public class GameService {
         playerExecutable.setWriter(new PrintWriter(playerExecutable.getProcess().getOutputStream()));
     }
 
-    private String writeAndRead(String message, Player player) throws IOException, ExecutionExcepetion {
+    private String writeAndRead(String message, Player player) throws IOException, ExecutionException {
         player.getPlayerExecutable().getWriter().println(message);
         player.getPlayerExecutable().getWriter().flush();
         String line = "";
@@ -185,8 +182,8 @@ public class GameService {
         Future<String> future = executor.submit(() -> scanner.nextLine());
         try {
             line = future.get(1000, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e1) {
-            throw new ExecutionExcepetion("Read timeout", player);
+        } catch (InterruptedException | java.util.concurrent.ExecutionException | TimeoutException e1) {
+            throw new ExecutionException("Read timeout", player);
         }
         return line;
     }

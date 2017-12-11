@@ -1,6 +1,6 @@
 package com.algorytmy;
 
-import com.algorytmy.Exceptions.ExecutionExcepetion;
+import com.algorytmy.Exceptions.ExecutionException;
 import com.algorytmy.Model.Match;
 import com.algorytmy.Services.AutoGameRunner;
 import com.algorytmy.Services.GameService;
@@ -39,7 +39,7 @@ public class JudgeApplicationTests {
     I know it is not a valid unit test, just leave it be
      */
     @Test
-    public void canRunBasicGame() throws IOException, ExecutionExcepetion {
+    public void canRunBasicGame() throws IOException, ExecutionException {
         loaderService.loadPlayers(playersFolder.getFile());
 //        gameService.createGame(possibleMatches.get(0));
 //        while(gameService.nextMove() != null) {}
