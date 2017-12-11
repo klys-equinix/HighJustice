@@ -5,13 +5,10 @@ import com.algorytmy.Model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.NestedExceptionUtils;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Scanner;
 import java.util.concurrent.*;
 import java.util.stream.IntStream;
@@ -90,7 +87,7 @@ public class GameService {
             try {
                 Move firstMove = validateMove(new Move(writeAndRead("start", currentPlayer),
                         currentPlayer));
-                if(firstMove != null) {
+                if (firstMove != null) {
                     switchPlayers();
                     lastValidMove = firstMove;
                 }
@@ -101,14 +98,14 @@ public class GameService {
                 return null;
             }
         }
-        if(noFreeSpaceLeft()) {
+        if (noFreeSpaceLeft()) {
             finalizeMatch(otherPlayer, currentPlayer, MatchResult.GAME_ENDER.DEFAULT);
             return null;
         }
         try {
             Move move = validateMove(new Move(writeAndRead(lastValidMove.toString(), currentPlayer),
                     currentPlayer));
-            if(move != null) {
+            if (move != null) {
                 switchPlayers();
                 lastValidMove = move;
             }
@@ -120,12 +117,12 @@ public class GameService {
         }
     }
 
-    public void endMatch() {
+    private void endMatch() {
         currentPlayer.getPlayerExecutable().getWriter().println("stop");
         otherPlayer.getPlayerExecutable().getWriter().println("stop");
         MatchResult matchResult = currentMatch.getMatchResult();
         matchResultRepository.save(matchResult);
-        currentMatch = null;
+        //currentMatch = null;
         matchResult.getWinner().addToScore();
         playerRepository.save(matchResult.getWinner());
         playerRepository.save(matchResult.getLoser());
@@ -137,16 +134,17 @@ public class GameService {
         MatchResult matchResult = new MatchResult(winner, loser, gameEnder);
         currentMatch.setMatchStatus(MatchStatus.ENDED);
         currentMatch.setMatchResult(matchResult);
+        endMatch();
         currentMatch.getMatchEndListeners().forEach((matchEndListener -> matchEndListener.matchEnded(currentMatch)));
     }
 
     private boolean noFreeSpaceLeft() {
-        for(int i = 0; i < currentMatch.getBoard().length; i++) {
-            for(int j = 0; i < currentMatch.getBoard().length; i++) {
-                if(i++ < currentMatch.getBoard().length && currentMatch.getBoard()[i][j].equals(Match.FIELD_VALUE.EMPTY) && currentMatch.getBoard()[i++][j].equals(Match.FIELD_VALUE.EMPTY)) {
+        for (int i = 0; i < currentMatch.getBoard().length; i++) {
+            for (int j = 0; i < currentMatch.getBoard().length; i++) {
+                if (i++ < currentMatch.getBoard().length && currentMatch.getBoard()[i][j].equals(Match.FIELD_VALUE.EMPTY) && currentMatch.getBoard()[i++][j].equals(Match.FIELD_VALUE.EMPTY)) {
                     return false;
                 }
-                if(j++ < currentMatch.getBoard().length && currentMatch.getBoard()[i][j].equals(Match.FIELD_VALUE.EMPTY) && currentMatch.getBoard()[i][j++].equals(Match.FIELD_VALUE.EMPTY)) {
+                if (j++ < currentMatch.getBoard().length && currentMatch.getBoard()[i][j].equals(Match.FIELD_VALUE.EMPTY) && currentMatch.getBoard()[i][j++].equals(Match.FIELD_VALUE.EMPTY)) {
                     return false;
                 }
             }
@@ -159,7 +157,7 @@ public class GameService {
                 move.getY1() < currentMatch.getBoard().length && move.getY1() > 0 &&
                 move.getX2() < currentMatch.getBoard()[0].length && move.getX2() > 0 &&
                 move.getY2() < currentMatch.getBoard().length && move.getY2() > 0) {
-            if(currentMatch.getBoard()[move.getX1()][move.getY1()].equals(Match.FIELD_VALUE.EMPTY) &&
+            if (currentMatch.getBoard()[move.getX1()][move.getY1()].equals(Match.FIELD_VALUE.EMPTY) &&
                     currentMatch.getBoard()[move.getX2()][move.getY2()].equals(Match.FIELD_VALUE.EMPTY)) {
                 Match.FIELD_VALUE[][] board = currentMatch.getBoard();
                 board[move.getX1()][move.getY1()] = currentPlayer.getPlayerSignature();

@@ -5,5 +5,5 @@ import de.felixroske.jfxsupport.FXMLView;
 
 @FXMLView
 public class MapWindowView extends AbstractFxmlView {
-    
+
 }

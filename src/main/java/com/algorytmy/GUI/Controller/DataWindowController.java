@@ -1,35 +1,37 @@
 package com.algorytmy.GUI.Controller;
 
 import com.algorytmy.Exceptions.ExecutionExcepetion;
-import com.algorytmy.GUI.View.ComputingWindowView;
 import com.algorytmy.GUI.View.MapWindowView;
 import com.algorytmy.JudgeApplication;
 import com.algorytmy.Model.*;
+import com.algorytmy.Services.AutoGameRunner;
 import com.algorytmy.Services.GameService;
 import com.algorytmy.Services.LoaderService;
 import de.felixroske.jfxsupport.FXMLController;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.function.Consumer;
+import java.util.Calendar;
 
 @FXMLController
 public class DataWindowController {
@@ -47,11 +49,7 @@ public class DataWindowController {
 
     private Stage stg;
 
-    @Value(value = "classpath:Players")
-    private Resource playersFolder;
 
-    @FXML
-    private MenuItem closeDirectoryMenuItem;
     @FXML
     private MenuItem exportResultsMenuItem;
     @FXML
@@ -61,7 +59,11 @@ public class DataWindowController {
     @FXML
     private ContextMenu contextMenu;
     @FXML
-    private MenuItem startAutomaticMenuItem;
+    private MenuItem automaticSimulationMenuItem;
+    @FXML
+    private MenuItem openDirectoryMenuItem;
+    @FXML
+    private VBox container;
 
     private ObservableList<Player> playerList;
     private ObservableList<Match> matchList;
@@ -69,24 +71,18 @@ public class DataWindowController {
     @Autowired
     private MapWindowController mwc;
 
-    public DataWindowController() { }
+    @Autowired
+    private AutoGameRunner autoGameRunner;
+
+    public DataWindowController() {
+    }
 
     @FXML
     private void initialize() throws IOException {
         stg = JudgeApplication.getStage();
         playerList = FXCollections.observableArrayList();
         matchList = FXCollections.observableArrayList(person ->
-                new Observable[] {person.getMatchStatusProperty()} );
-        matchList.addListener((ListChangeListener.Change<? extends Match> change) -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    System.out.println("Add");
-                }
-                if (change.wasUpdated()) {
-                    System.out.println("Update");
-                }
-            }
-        });
+                new Observable[]{person.getMatchStatusProperty()});
 
         playersTable.setItems(playerList);
         matchTable.setItems(matchList);
@@ -94,18 +90,18 @@ public class DataWindowController {
         TableColumn<Player, String> playerNameColumn = (TableColumn<Player, String>) playersTable.getColumns().get(0);
         TableColumn<Player, Integer> playerPointsColumn = (TableColumn<Player, Integer>) playersTable.getColumns().get(1);
 
-        playerNameColumn.setStyle( "-fx-alignment: CENTER;");
-        playerPointsColumn.setStyle( "-fx-alignment: CENTER;");
+        playerNameColumn.setStyle("-fx-alignment: CENTER;");
+        playerPointsColumn.setStyle("-fx-alignment: CENTER;");
 
         TableColumn<Match, String> player1Column = (TableColumn<Match, String>) matchTable.getColumns().get(0);
         TableColumn<Match, String> player2Column = (TableColumn<Match, String>) matchTable.getColumns().get(1);
         TableColumn<Match, MatchStatus> statusColumn = (TableColumn<Match, MatchStatus>) matchTable.getColumns().get(2);
         TableColumn<Match, String> resultColumn = (TableColumn<Match, String>) matchTable.getColumns().get(3);
 
-        player1Column.setStyle( "-fx-alignment: CENTER;");
-        player2Column.setStyle( "-fx-alignment: CENTER;");
-        statusColumn.setStyle( "-fx-alignment: CENTER;");
-        resultColumn.setStyle( "-fx-alignment: CENTER;");
+        player1Column.setStyle("-fx-alignment: CENTER;");
+        player2Column.setStyle("-fx-alignment: CENTER;");
+        statusColumn.setStyle("-fx-alignment: CENTER;");
+        resultColumn.setStyle("-fx-alignment: CENTER;");
 
         playerNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         playerPointsColumn.setCellValueFactory(new PropertyValueFactory<>("score"));
@@ -135,82 +131,108 @@ public class DataWindowController {
             }
         });
 
-        gameService.addMathEndListener(mth -> {
-            Match mtch = null;
-            int i;
-            for(i = 0; i < matchList.size(); i++) {
-                Match n = matchList.get(i);
-                if(n.getPlayer1() == mth.getPlayer1() && n.getPlayer2() == mth.getPlayer2())
-                {
-                    mtch = n;
-                    break;
-                }
-            }
-            mtch.setMatchStatus(MatchStatus.ENDED);
-            mtch.setMatchResult(mth.getMatchResult());
-            matchList.set(i, mtch);
+        Platform.runLater(() -> {
+            ((Stage) container.getScene().getWindow()).setTitle("HighJustice");
+            container.getScene().getWindow().setOnHidden(windowEvent -> {
+                Platform.exit();
+                System.exit(0);
+            });
         });
     }
 
     @FXML
-    private void onOpenDirectorySelected(ActionEvent actionEvent) {
+    private void onOpenDirectorySelected(ActionEvent actionEvent) throws IOException {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory");
         File dir = dirChooser.showDialog(stg);
-        if(dir == null)
+        if (dir == null)
             return;
-        // Time to load but at the moment I will mock it up
-        try {
-            loaderService.loadPlayers(playersFolder.getFile());
-        } catch (IOException e) {
-            showErrorDialog("IO Exception", "Woops! Choose more wisely next time!");
-            return;
-        }
-        closeDirectoryMenuItem.setDisable(false);
-        exportResultsMenuItem.setDisable(false);
-        startAutomaticMenuItem.setDisable(false);
+
+        loaderService.loadPlayers(dir);
+
+        automaticSimulationMenuItem.setDisable(false);
+        openDirectoryMenuItem.setDisable(true);
 
         playerList.addAll(playerRepository.findAll());
         matchList.addAll(possibleMatches);
-    }
 
-    @FXML
-    private void onCloseDirectorySelected(ActionEvent actionEvent) {
-        // TODO
-        closeDirectoryMenuItem.setDisable(true);
-        exportResultsMenuItem.setDisable(true);
-        startAutomaticMenuItem.setDisable(true);
+        for (Match m : matchList) {
+            m.addMathEndListener(mth -> {
+                boolean found = false;
+                for (int i = 0; i < matchList.size(); i++) {
+                    Match min = matchList.get(i);
+                    if (min.getPlayer1() == mth.getPlayer1() && min.getPlayer2() == mth.getPlayer2()) {
+                        matchList.set(i, mth);
+                    }
+                    if (min.getMatchStatus() != MatchStatus.ENDED)
+                        found = true;
+                }
+
+                if (!found)
+                    exportResultsMenuItem.setDisable(false);
+
+                playerList.clear();
+                playerList.addAll(playerRepository.findAll());
+            });
+        }
     }
 
     @FXML
     private void onExportResultsSelected(ActionEvent actionEvent) {
-        // TODO
+        FileChooser fileChooser = new FileChooser();
+        File dir = fileChooser.showSaveDialog(stg);
+        if (dir == null)
+            return;
+
+        BufferedWriter bw;
+        StringBuilder sb = new StringBuilder();
+        try {
+            bw = new BufferedWriter(new FileWriter(dir));
+            sb.append("Tournament at ").append(Calendar.getInstance().getTime())
+                    .append("\n\n").append("Players : Points\n\n");
+            bw.write(sb.toString());
+            sb.setLength(0);
+            for (Player p : playerList) {
+                sb.append(p.getName()).append(" : ").append(p.getScore()).append("\n");
+            }
+            bw.write(sb.toString());
+            bw.write("\nMatches\n\n");
+            sb.setLength(0);
+            for (Match m : matchList) {
+                sb.append(m.getPlayer1().getName()).append(" vs ").append(m.getPlayer2().getName()).append(" winner: ")
+                        .append(m.getMatchResult().getWinner().getName()).append(", reason: ")
+                        .append(m.getMatchResult().getGameEnder()).append("\n");
+            }
+            bw.write(sb.toString());
+            bw.flush();
+            bw.close();
+        } catch (IOException e) {
+            showErrorDialog("There was an error when trying to write to file!",
+                    "Results could be written to file.\nPlease try again later!");
+            return;
+        }
     }
 
     @FXML
-    private void onStartAutomaticSelected(ActionEvent actionEvent) {
-        // TODO
-        gameService.runAllGames();
-        JudgeApplication.showView(ComputingWindowView.class, Modality.NONE);
+    private void onAutomaticSimulationSelected(ActionEvent actionEvent) {
+        autoGameRunner.runAllGames();
     }
 
     @FXML
     private void onManualSelected(ActionEvent actionEvent) {
-        // TODO
         Match mtch = matchTable.getSelectionModel().getSelectedItem();
-        if(mtch.getMatchStatus() == MatchStatus.ENDED)
+        if (mtch.getMatchStatus() == MatchStatus.ENDED)
             return;
 
-        for(Match m : matchList) {
-            if(m.getMatchStatus() == MatchStatus.IN_PROGRESS && m != mtch)
+        for (Match m : matchList) {
+            if (m.getMatchStatus() == MatchStatus.IN_PROGRESS && m != mtch)
                 return;
         }
 
         int i;
-        for(i = 0; i < matchList.size(); i++) {
+        for (i = 0; i < matchList.size(); i++) {
             Match n = matchList.get(i);
-            if(n.getPlayer1() == mtch.getPlayer1() && n.getPlayer2() == mtch.getPlayer2())
-            {
+            if (n.getPlayer1() == mtch.getPlayer1() && n.getPlayer2() == mtch.getPlayer2()) {
                 mtch = n;
                 break;
             }
@@ -220,12 +242,16 @@ public class DataWindowController {
             mtch.setMatchStatus(MatchStatus.IN_PROGRESS);
             matchList.set(i, mtch);
         } catch (ExecutionExcepetion executionExcepetion) {
-            executionExcepetion.printStackTrace();
+            showErrorDialog("There was a problem when trying to run program!", executionExcepetion.toString());
         }
 
         contextMenu.hide();
+        if (mwc.isInitialized())
+            mwc.onOpen();
         JudgeApplication.showView(MapWindowView.class, Modality.WINDOW_MODAL);
         mwc.onOpen();
+
+        automaticSimulationMenuItem.setDisable(true);
     }
 
     @FXML
@@ -246,13 +272,11 @@ public class DataWindowController {
         stg.close();
     }
 
-    private String getHumanMatchResult(MatchResult mr)
-    {
+    private String getHumanMatchResult(MatchResult mr) {
         StringBuilder sb = new StringBuilder();
-        if(mr.getGameEnder() != MatchResult.GAME_ENDER.DEFAULT) {
+        if (mr.getGameEnder() != MatchResult.GAME_ENDER.DEFAULT) {
             sb.append(mr.getGameEnder()).append(" : ").append(mr.getLoser().getName());
-        }
-        else {
+        } else {
             sb.append(mr.getWinner().getName()).append(" won");
         }
         return sb.toString();

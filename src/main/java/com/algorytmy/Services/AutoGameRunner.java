@@ -34,8 +34,7 @@ public class AutoGameRunner {
             } catch (ExecutionExcepetion executionExcepetion) {
                 logger.error(executionExcepetion.getGuilty().toString());
             }
-            while(gameService.nextMove() != null);
-            gameService.endMatch();
+            while (gameService.nextMove() != null) ;
         });
     }
 }

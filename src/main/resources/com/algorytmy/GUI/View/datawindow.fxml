@@ -6,7 +6,6 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
@@ -18,12 +17,14 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#onOpenDirectorySelected" text="Open directory" />
-                <MenuItem fx:id="closeDirectoryMenuItem" disable="true" mnemonicParsing="false" onAction="#onCloseDirectorySelected" text="Close directory" />
+              <MenuItem mnemonicParsing="false" fx:id="openDirectoryMenuItem" onAction="#onOpenDirectorySelected" text="Open directory" />
                 <MenuItem fx:id="exportResultsMenuItem" disable="true" mnemonicParsing="false" onAction="#onExportResultsSelected" text="Export results to file" />
             </items>
           </Menu>
-          <Menu fx:id="startAutomaticMenuItem" disable="true" onAction="#onStartAutomaticSelected" mnemonicParsing="false" text="Run automatic simulation" />
+          <Menu mnemonicParsing="false" text="Simulation">
+               <items>
+                  <MenuItem fx:id="automaticSimulationMenuItem" disable="true" mnemonicParsing="false" onAction="#onAutomaticSimulationSelected" text="Run automatic simulation" />
+               </items></Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
               <MenuItem mnemonicParsing="false" onAction="#onAboutSelected" text="About" />

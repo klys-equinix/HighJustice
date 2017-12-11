@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,7 +40,7 @@ public class LoaderService {
     private void loadPossibleGames() {
         playerExecutables.forEach((playerName, player) -> {
             playerExecutables.forEach((playerName1, player1) -> {
-                if(!playerName.equals(playerName1)) {
+                if (!playerName.equals(playerName1)) {
                     Match match = new Match();
                     match.setPlayer1(player);
                     match.setPlayer2(player1);
@@ -59,8 +58,8 @@ public class LoaderService {
         PlayerExecutable playerExecutable = new PlayerExecutable();
         String command = "";
         String path = "";
-        for(File file : files) {
-            if(file.getName().equals("info.txt")) {
+        for (File file : files) {
+            if (file.getName().equals("info.txt")) {
                 try {
                     BufferedReader fileReader = new BufferedReader(new FileReader(file));
                     player.setName(fileReader.readLine());

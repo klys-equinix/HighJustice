@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class ExecutionExcepetion extends Exception {
     private Player guilty;
+
     public ExecutionExcepetion(String message, Player guiltyPlayer) {
         super();
         this.guilty = guiltyPlayer;

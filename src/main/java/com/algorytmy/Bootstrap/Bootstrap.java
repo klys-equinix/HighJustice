@@ -1,8 +1,9 @@
 package com.algorytmy.Bootstrap;
 
-import com.algorytmy.GUI.Controller.ComputingWindowController;
-import com.algorytmy.JudgeApplication;
-import com.algorytmy.Model.*;
+import com.algorytmy.Model.MatchResult;
+import com.algorytmy.Model.MatchResultRepository;
+import com.algorytmy.Model.Player;
+import com.algorytmy.Model.PlayerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

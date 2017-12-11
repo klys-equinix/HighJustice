@@ -11,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @FXMLController
@@ -36,7 +35,13 @@ public class MapWindowController {
     @Autowired
     private MapDrawer md;
 
-    public MapWindowController() { }
+    @Autowired
+    private DataWindowController dataWindowController;
+
+    private boolean initialized = false;
+
+    public MapWindowController() {
+    }
 
     @FXML
     private void initialize() {
@@ -52,25 +57,33 @@ public class MapWindowController {
         });
 
         twoStepButton.setOnAction(actionEvent -> {
-            for(int i = 0; i < 5; i++)
+            for (int i = 0; i < 5; i++)
                 gs.nextMove();
             md.drawBoard(gc, gs.getCurrentMatch().getBoard());
         });
 
         endButton.setOnAction(actionEvent -> {
-            while (gs.nextMove() != null) { }
+            while (gs.nextMove() != null) {
+            }
             md.drawBoard(gc, gs.getCurrentMatch().getBoard());
         });
 
-        gs.addMathEndListener(mtch -> {
-            nextStepButton.setDisable(true);
-            twoStepButton.setDisable(true);
-            endButton.setDisable(true);
+        gs.getCurrentMatch().addMathEndListener(mtch -> {
+            handleMatchEnding();
         });
+
+
+        Platform.runLater(() -> {
+            ((Stage) container.getScene().getWindow()).setTitle("HighJustice - map drawer");
+        });
+
+        initialized = true;
     }
 
-    public void onOpen()
-    {
+    void onOpen() {
+        gs.getCurrentMatch().addMathEndListener(mtch -> {
+            handleMatchEnding();
+        });
         canvas.setWidth(gs.getCurrentMatch().getBoard().length);
         canvas.setHeight(gs.getCurrentMatch().getBoard()[0].length);
         md.drawBoard(gc, gs.getCurrentMatch().getBoard());
@@ -80,16 +93,24 @@ public class MapWindowController {
     }
 
     @FXML
-    private void onScroll(ScrollEvent scrollEvent)
-    {
-        if(zoom <= 1 && scrollEvent.getDeltaY() < 0)
+    private void onScroll(ScrollEvent scrollEvent) {
+        if (zoom <= 1 && scrollEvent.getDeltaY() < 0)
             return;
-        if(zoom >= 10 && scrollEvent.getDeltaY() > 0)
+        if (zoom >= 10 && scrollEvent.getDeltaY() > 0)
             return;
 
-        zoom += scrollEvent.getDeltaY()/500;
+        zoom += scrollEvent.getDeltaY() / 500;
         canvas.setScaleX(zoom);
         canvas.setScaleY(zoom);
     }
 
+    boolean isInitialized() {
+        return initialized;
+    }
+
+    private void handleMatchEnding() {
+        nextStepButton.setDisable(true);
+        twoStepButton.setDisable(true);
+        endButton.setDisable(true);
+    }
 }
