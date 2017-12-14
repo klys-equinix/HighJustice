@@ -116,7 +116,9 @@ public class GameService {
     }
 
     public void endMatch() {
+        logger.debug("system" + " :" + currentPlayer.getName() + " stop");
         currentPlayer.getPlayerExecutable().getWriter().println("stop");
+        logger.debug("system" + " :" + otherPlayer.getName() + " stop");
         otherPlayer.getPlayerExecutable().getWriter().println("stop");
         MatchResult matchResult = currentMatch.getMatchResult();
         matchResultRepository.save(matchResult);
@@ -129,6 +131,7 @@ public class GameService {
     }
 
     private void finalizeMatch(Player winner, Player loser, MatchResult.GAME_ENDER gameEnder) {
+        logger.debug("GAME_ENDER" + " :" + gameEnder + " loser: " + loser.getName() + " winner: " + winner.getName());
         isFirstMove = true;
         MatchResult matchResult = new MatchResult(winner, loser, gameEnder);
         currentMatch.setMatchResult(matchResult);
@@ -164,6 +167,7 @@ public class GameService {
                 return move;
             }
         }
+        logger.debug("BAD_INSERTION " + move.toString() + " " + currentPlayer.getName());
         finalizeMatch(otherPlayer, currentPlayer, MatchResult.GAME_ENDER.WRONG_INSERTION);
         return null;
     }
@@ -174,6 +178,7 @@ public class GameService {
     }
 
     private String writeAndRead(String message, Player player) throws IOException, ExecutionException {
+        logger.debug("system" + " :" + message);
         player.getPlayerExecutable().getWriter().println(message);
         player.getPlayerExecutable().getWriter().flush();
         String line = "";
@@ -185,6 +190,7 @@ public class GameService {
         } catch (InterruptedException | java.util.concurrent.ExecutionException | TimeoutException e1) {
             throw new ExecutionException("Read timeout", player);
         }
+        logger.debug(player.getName() + " :" + line);
         return line;
     }
 
