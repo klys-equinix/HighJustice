@@ -34,16 +34,17 @@ public class Match {
         board = new FIELD_VALUE[size][size];
         for (FIELD_VALUE[] row : this.board)
             Arrays.fill(row, FIELD_VALUE.EMPTY);
-        int obstacleRate = size * size / 10; // about 20% of board will be taken by obstacles
-        Random random = new Random();
+        int obstacleRate = size * size / 20;
         for(int i = 0; i < obstacleRate; i++) {
-            int obstacleLoc = random.nextInt(size - 1);
+            Random random = new Random();
+            int obstacleLocX = random.nextInt(size - 1);
+            int obstacleLocY = random.nextInt(size - 1);
             if(i % 2 == 0) {
-                board[obstacleLoc][obstacleLoc] = FIELD_VALUE.OBSTACLE;
-                board[obstacleLoc][obstacleLoc + 1] = FIELD_VALUE.OBSTACLE;
+                board[obstacleLocX][obstacleLocY] = FIELD_VALUE.OBSTACLE;
+                board[obstacleLocX][obstacleLocY + 1] = FIELD_VALUE.OBSTACLE;
             } else {
-                board[obstacleLoc][obstacleLoc] = FIELD_VALUE.OBSTACLE;
-                board[obstacleLoc + 1][obstacleLoc] = FIELD_VALUE.OBSTACLE;
+                board[obstacleLocX][obstacleLocY] = FIELD_VALUE.OBSTACLE;
+                board[obstacleLocX + 1][obstacleLocY] = FIELD_VALUE.OBSTACLE;
             }
         }
     }
