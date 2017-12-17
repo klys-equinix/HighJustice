@@ -1,6 +1,6 @@
 package com.algorytmy.GUI.Controller;
 
-import com.algorytmy.Exceptions.ExecutionExcepetion;
+import com.algorytmy.Exceptions.ExecutionException;
 import com.algorytmy.GUI.View.MapWindowView;
 import com.algorytmy.JudgeApplication;
 import com.algorytmy.Model.*;
@@ -23,8 +23,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -241,7 +239,7 @@ public class DataWindowController {
             gameService.createGame(mtch);
             mtch.setMatchStatus(MatchStatus.IN_PROGRESS);
             matchList.set(i, mtch);
-        } catch (ExecutionExcepetion executionExcepetion) {
+        } catch (ExecutionException executionExcepetion) {
             showErrorDialog("There was a problem when trying to run program!", executionExcepetion.toString());
         }
 
