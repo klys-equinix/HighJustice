@@ -39,6 +39,7 @@ public class GameService {
      */
     public Match createGame(Match possibleMatch) throws ExecutionException {
         this.currentMatch = possibleMatch;
+        currentMatch.setMatchStatus(MatchStatus.IN_PROGRESS);
         currentPlayer = possibleMatch.getPlayer1();
         otherPlayer = possibleMatch.getPlayer2();
         try {
@@ -134,8 +135,12 @@ public class GameService {
         logger.debug("GAME_ENDER" + " :" + gameEnder + " loser: " + loser.getName() + " winner: " + winner.getName());
         isFirstMove = true;
         MatchResult matchResult = new MatchResult(winner, loser, gameEnder);
+        currentMatch.setMatchStatus(MatchStatus.ENDED);
         currentMatch.setMatchResult(matchResult);
-        currentMatch.getMatchEndListeners().forEach((matchEndListener -> matchEndListener.matchEnded(currentMatch)));
+
+        Match currentCopy = currentMatch;
+        endMatch();
+        currentCopy.getMatchEndListeners().forEach((matchEndListener -> matchEndListener.matchEnded(currentCopy)));
     }
 
     private boolean noFreeSpaceLeft() {

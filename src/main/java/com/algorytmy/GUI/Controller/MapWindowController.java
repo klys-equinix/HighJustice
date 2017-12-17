@@ -53,19 +53,22 @@ public class MapWindowController {
 
         nextStepButton.setOnAction(actionEvent -> {
             gs.nextMove();
-            md.drawBoard(gc, gs.getCurrentMatch().getBoard());
+            if(gs.getCurrentMatch() != null)
+                md.drawBoard(gc, gs.getCurrentMatch().getBoard());
         });
 
         twoStepButton.setOnAction(actionEvent -> {
             for (int i = 0; i < 5; i++)
                 gs.nextMove();
-            md.drawBoard(gc, gs.getCurrentMatch().getBoard());
+            if(gs.getCurrentMatch() != null)
+                md.drawBoard(gc, gs.getCurrentMatch().getBoard());
         });
 
         endButton.setOnAction(actionEvent -> {
             while (gs.nextMove() != null) {
             }
-            md.drawBoard(gc, gs.getCurrentMatch().getBoard());
+            if(gs.getCurrentMatch() != null)
+                md.drawBoard(gc, gs.getCurrentMatch().getBoard());
         });
 
         gs.getCurrentMatch().addMathEndListener(mtch -> {
@@ -81,12 +84,15 @@ public class MapWindowController {
     }
 
     void onOpen() {
-        gs.getCurrentMatch().addMathEndListener(mtch -> {
-            handleMatchEnding();
-        });
-        canvas.setWidth(gs.getCurrentMatch().getBoard().length);
-        canvas.setHeight(gs.getCurrentMatch().getBoard()[0].length);
-        md.drawBoard(gc, gs.getCurrentMatch().getBoard());
+        if(gs.getCurrentMatch() != null) {
+            gs.getCurrentMatch().addMathEndListener(mtch -> {
+                handleMatchEnding();
+                md.drawBoard(gc, mtch.getBoard());
+            });
+            canvas.setWidth(gs.getCurrentMatch().getBoard().length);
+            canvas.setHeight(gs.getCurrentMatch().getBoard()[0].length);
+            md.drawBoard(gc, gs.getCurrentMatch().getBoard());
+        }
         nextStepButton.setDisable(false);
         twoStepButton.setDisable(false);
         endButton.setDisable(false);
