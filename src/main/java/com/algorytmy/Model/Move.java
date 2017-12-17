@@ -14,9 +14,11 @@ public class Move {
     private Integer x2;
     private Integer y2;
     private Player player;
+
     public String toString() {
         return x1 + "x" + y1 + "_" + x2 + "x" + y2;
     }
+
     public Move(String move, Player player) {
         String[] coordinates = move.split("x|_");
         x1 = Integer.valueOf(coordinates[0]);

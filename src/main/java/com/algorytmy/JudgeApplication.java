@@ -1,14 +1,15 @@
 package com.algorytmy;
 
-import org.springframework.boot.SpringApplication;
+import com.algorytmy.GUI.Utility.CustomSplash;
+import com.algorytmy.GUI.View.DataWindowView;
+import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class JudgeApplication {
+public class JudgeApplication extends AbstractJavaFxApplicationSupport {
 
-
-
-	public static void main(String[] args) {
-		SpringApplication.run(JudgeApplication.class, args);
-	}
+    public static void main(String[] args) {
+        launchApp(JudgeApplication.class, DataWindowView.class, new CustomSplash(), args);
+        //SpringApplication.run(JudgeApplication.class, args);
+    }
 }

@@ -1,6 +1,7 @@
 package com.algorytmy.Model;
 
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -15,7 +16,7 @@ import javax.validation.constraints.NotNull;
 public class MatchResult {
 
     public enum GAME_ENDER {
-            WRONG_INSERTION, TIMEOUT, DEFAULT, CANNOT_EXECUTE
+        WRONG_INSERTION, TIMEOUT, DEFAULT, CANNOT_EXECUTE
     }
 
     @Id
