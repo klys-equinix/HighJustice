@@ -23,18 +23,5 @@ public class Bootstrap {
 
     @PostConstruct
     public void bootstrap() {
-        Player player1 = new Player("Konrad", 0);
-        Player player2 = new Player("Szymon", 0);
-        playerRepository.save(player1);
-        playerRepository.save(player2);
-        MatchResult matchResult = new MatchResult();
-        matchResult.setWinner(player1);
-        matchResult.setLoser(player2);
-        matchResult.setGameEnder(MatchResult.GAME_ENDER.DEFAULT);
-        matchResultRepository.save(matchResult);
-
-        logger.info(matchResultRepository.findAll().get(0).toString());
-        logger.info(playerRepository.findAll().get(0).toString());
-        logger.info(matchResultRepository.findByWinner_Name("Konrad").toString());
     }
 }

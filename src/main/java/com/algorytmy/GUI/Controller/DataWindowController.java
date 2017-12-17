@@ -247,7 +247,7 @@ public class DataWindowController {
         contextMenu.hide();
         if (mwc.isInitialized())
             mwc.onOpen();
-        JudgeApplication.showView(MapWindowView.class);
+        JudgeApplication.showView(MapWindowView.class, Modality.APPLICATION_MODAL);
         mwc.onOpen();
 
         automaticSimulationMenuItem.setDisable(true);
