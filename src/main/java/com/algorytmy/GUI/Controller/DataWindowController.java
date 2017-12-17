@@ -145,8 +145,9 @@ public class DataWindowController {
 
         try {
             loaderService.loadPlayers(dir);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            showErrorDialog("Cannot load players!", "The entered directory seems to be invalid.\nPlease try again!");
+            return;
         }
 
         automaticSimulationMenuItem.setDisable(false);
