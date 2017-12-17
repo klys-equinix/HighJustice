@@ -1,5 +1,6 @@
 package com.algorytmy.Services;
 
+import com.algorytmy.Exceptions.ExecutionException;
 import com.algorytmy.Model.Match;
 import com.algorytmy.Model.Player;
 import com.algorytmy.Model.PlayerExecutable;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -31,9 +31,14 @@ public class LoaderService {
     @Autowired
     private ArrayList<Match> possibleMatches;
 
-    public void loadPlayers(File playersFolder) {
+    public void loadPlayers(File playersFolder) throws IOException {
         File[] directories = playersFolder.listFiles(file -> file.isDirectory());
-        Arrays.stream(directories).forEach(directory -> parseDirectory(directory));
+        if(directories.length == 0) {
+            throw new IOException("Folder empty");
+        }
+        for(File directory : directories) {
+            parseDirectory(directory);
+        }
         loadPossibleGames();
     }
 
@@ -54,7 +59,7 @@ public class LoaderService {
 
     }
 
-    private void parseDirectory(File directory) {
+    private void parseDirectory(File directory) throws FileNotFoundException {
         File[] files = directory.listFiles();
         Player player = new Player();
         PlayerExecutable playerExecutable = new PlayerExecutable();
@@ -74,6 +79,9 @@ public class LoaderService {
             } else {
                 path = file.getAbsolutePath();
             }
+        }
+        if(command.isEmpty() || path.isEmpty()) {
+            throw new FileNotFoundException("Incorrect folder");
         }
         playerExecutable.setCommandLineExecution(command + " " + path);
         player.setPlayerExecutable(playerExecutable);

@@ -24,10 +24,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -146,7 +143,11 @@ public class DataWindowController {
         if (dir == null)
             return;
 
-        loaderService.loadPlayers(dir);
+        try {
+            loaderService.loadPlayers(dir);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
         automaticSimulationMenuItem.setDisable(false);
         openDirectoryMenuItem.setDisable(true);
