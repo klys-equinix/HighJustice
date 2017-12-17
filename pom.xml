@@ -5,7 +5,7 @@
 
 	<groupId>com.algorytmy</groupId>
 	<artifactId>judge</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
 	<name>judge</name>
@@ -66,6 +66,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+
 		</plugins>
 	</build>
 

@@ -146,7 +146,7 @@ public class DataWindowController {
         try {
             loaderService.loadPlayers(dir);
         } catch (Exception e) {
-            showErrorDialog("Cannot load players!", "The entered directory seems to be invalid.\nPlease try again!");
+            showWarningDialog("Cannot load players!", "The entered directory seems to be invalid.\nPlease try again!");
             return;
         }
 
@@ -207,9 +207,8 @@ public class DataWindowController {
             bw.flush();
             bw.close();
         } catch (IOException e) {
-            showErrorDialog("There was an error when trying to write to file!",
+            showWarningDialog("There was an error when trying to write to file!",
                     "Results could be written to file.\nPlease try again later!");
-            return;
         }
     }
 
@@ -264,12 +263,17 @@ public class DataWindowController {
     }
 
     private void showErrorDialog(String header, String content) {
+        showErrorDialog(header, content);
+        stg.close();
+    }
+
+
+    private void showWarningDialog(String header, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error occured");
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
-        stg.close();
     }
 
     private String getHumanMatchResult(MatchResult mr) {
