@@ -1,10 +1,7 @@
 package com.algorytmy.Services;
 
 import com.algorytmy.Exceptions.ExecutionException;
-import com.algorytmy.Model.Match;
-import com.algorytmy.Model.Player;
-import com.algorytmy.Model.PlayerExecutable;
-import com.algorytmy.Model.PlayerRepository;
+import com.algorytmy.Model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +49,7 @@ public class LoaderService {
                     Match match = new Match();
                     match.setPlayer1(player);
                     match.setPlayer2(player1);
+                    match.setMatchStatus(MatchStatus.PENDING);
                     possibleMatches.add(match);
                 }
             });
