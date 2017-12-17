@@ -1,6 +1,6 @@
 package com.algorytmy.Services;
 
-import com.algorytmy.Exceptions.ExecutionExcepetion;
+import com.algorytmy.Exceptions.ExecutionException;
 import com.algorytmy.Model.Match;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +31,8 @@ public class AutoGameRunner {
         possibleMatches.forEach(match -> {
             try {
                 gameService.createGame(match);
-            } catch (ExecutionExcepetion executionExcepetion) {
-                logger.error(executionExcepetion.getGuilty().toString());
+            } catch (ExecutionException executionException) {
+                logger.error(executionException.getGuilty().toString());
             }
             while (gameService.nextMove() != null) ;
         });
