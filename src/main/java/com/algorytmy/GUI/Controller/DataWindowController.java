@@ -76,6 +76,7 @@ public class DataWindowController {
     private AutoGameRunner autoGameRunner;
 
     private int boardSize;
+    private File obstacleFile;
 
     public DataWindowController() {
     }
@@ -176,6 +177,9 @@ public class DataWindowController {
         boardSize = size;
         boardSizeMenuItem.setText("Board size: "+size+" units");
 
+        dirChooser.setTitle("Choose obstacle file or cancel");
+        obstacleFile = dirChooser.showDialog(stg);
+
         try {
             loaderService.loadPlayers(dir);
         } catch (Exception e) {
@@ -247,7 +251,7 @@ public class DataWindowController {
 
     @FXML
     private void onAutomaticSimulationSelected(ActionEvent actionEvent) {
-        autoGameRunner.runAllGames(boardSize, null);
+        autoGameRunner.runAllGames(boardSize, obstacleFile);
     }
 
     @FXML
@@ -270,13 +274,11 @@ public class DataWindowController {
             }
         }
         try {
-            gameService.createGame(mtch, boardSize, null);
+            gameService.createGame(mtch, boardSize, obstacleFile);
             mtch.setMatchStatus(MatchStatus.IN_PROGRESS);
             matchList.set(i, mtch);
-        } catch (ExecutionException executionExcepetion) {
+        } catch (ExecutionException | IOException executionExcepetion) {
             showErrorDialog("There was a problem when trying to run program!", executionExcepetion.toString());
-        } catch (IOException e) {
-            showErrorDialog("There was a problem when trying to run program!", e.toString());
         }
 
         contextMenu.hide();

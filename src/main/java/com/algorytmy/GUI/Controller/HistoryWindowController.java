@@ -3,7 +3,6 @@ package com.algorytmy.GUI.Controller;
 import com.algorytmy.GUI.Utility.MapDrawer;
 import com.algorytmy.Model.Match;
 import com.algorytmy.Model.Move;
-import com.algorytmy.Services.GameService;
 import de.felixroske.jfxsupport.FXMLController;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
