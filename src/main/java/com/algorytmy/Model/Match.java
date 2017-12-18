@@ -51,10 +51,10 @@ public class Match {
             int obstacleLocY = random.nextInt(size - 1);
             if(i % 2 == 0) {
                 board[obstacleLocX][obstacleLocY] = FIELD_VALUE.OBSTACLE;
-                board[obstacleLocX][obstacleLocY + 1] = FIELD_VALUE.OBSTACLE;
+//                board[obstacleLocX][obstacleLocY + 1] = FIELD_VALUE.OBSTACLE;
             } else {
                 board[obstacleLocX][obstacleLocY] = FIELD_VALUE.OBSTACLE;
-                board[obstacleLocX + 1][obstacleLocY] = FIELD_VALUE.OBSTACLE;
+//                board[obstacleLocX + 1][obstacleLocY] = FIELD_VALUE.OBSTACLE;
             }
         }
     }
