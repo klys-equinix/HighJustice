@@ -23,8 +23,6 @@ public class Match {
     }
 
     private FIELD_VALUE[][] board;
-    private ArrayList<Move> player1Moves;
-    private ArrayList<Move> player2Moves;
     private Player player1;
     private Player player2;
     private MatchResult matchResult = new MatchResult();
@@ -51,12 +49,18 @@ public class Match {
             int obstacleLocY = random.nextInt(size - 1);
             if(i % 2 == 0) {
                 board[obstacleLocX][obstacleLocY] = FIELD_VALUE.OBSTACLE;
-//                board[obstacleLocX][obstacleLocY + 1] = FIELD_VALUE.OBSTACLE;
+                board[obstacleLocX][obstacleLocY + 1] = FIELD_VALUE.OBSTACLE;
             } else {
                 board[obstacleLocX][obstacleLocY] = FIELD_VALUE.OBSTACLE;
-//                board[obstacleLocX + 1][obstacleLocY] = FIELD_VALUE.OBSTACLE;
+                board[obstacleLocX + 1][obstacleLocY] = FIELD_VALUE.OBSTACLE;
             }
         }
+    }
+
+    public void createEmptyBoard(Integer size) {
+        board = new FIELD_VALUE[size][size];
+        for (FIELD_VALUE[] row : this.board)
+            Arrays.fill(row, FIELD_VALUE.EMPTY);
     }
 
     public ObjectProperty<MatchStatus> getMatchStatusProperty() {
