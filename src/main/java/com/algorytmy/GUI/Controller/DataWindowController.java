@@ -74,6 +74,8 @@ public class DataWindowController {
     @Autowired
     private AutoGameRunner autoGameRunner;
 
+    private int boardSize;
+
     public DataWindowController() {
     }
 
@@ -156,9 +158,21 @@ public class DataWindowController {
         Optional<String> result = dialog.showAndWait();
         Integer size;
         if (result.isPresent()){
-            size = Integer.getInteger(result.get());
+            try {
+                size = Integer.valueOf(result.get());
+            } catch (NumberFormatException e) {
+                showWarningDialog("Wrong map size entered!", "Try again!");
+                return;
+            }
         } else
             return;
+
+        if(size <= 0 || size > 999) {
+            showWarningDialog("Wrong map size entered!", "Try again!");
+            return;
+        }
+
+        boardSize = size;
 
         try {
             loaderService.loadPlayers(dir);
@@ -254,7 +268,7 @@ public class DataWindowController {
             }
         }
         try {
-            gameService.createGame(mtch, null);
+            gameService.createGame(mtch, boardSize);
             mtch.setMatchStatus(MatchStatus.IN_PROGRESS);
             matchList.set(i, mtch);
         } catch (ExecutionException executionExcepetion) {
