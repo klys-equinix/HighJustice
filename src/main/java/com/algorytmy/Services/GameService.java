@@ -70,15 +70,28 @@ public class GameService {
             possibleMatch.setBoard(loaderService.loadObstacles(obstacleFile, possibleMatch.getBoard()));
         }
 
+        StringBuilder builder = new StringBuilder();
+        builder.append(boardSize.toString());
+
+        for(int i = 0; i < boardSize; i++) {
+            for(int j = 0; j < boardSize; j++) {
+                if(possibleMatch.getBoard()[i][j].equals(Match.FIELD_VALUE.OBSTACLE)) {
+                    builder.append("_" + i + "x" + j);
+                }
+            }
+        }
+
+        String initMessage = builder.toString();
+
         try {
-            if (!writeAndRead(boardSize.toString(), currentPlayer).equals("OK"))
+            if (!writeAndRead(initMessage, currentPlayer).equals("OK"))
                 throw new IOException();
         } catch (IOException e) {
             finalizeMatch(possibleMatch.getPlayer2(), possibleMatch.getPlayer1(), MatchResult.GAME_ENDER.TIMEOUT);
             throw new ExecutionException("Player1 not responding", currentPlayer);
         }
         try {
-            if (!writeAndRead(boardSize.toString(), otherPlayer).equals("OK"))
+            if (!writeAndRead(initMessage, otherPlayer).equals("OK"))
                 throw new IOException();
         } catch (IOException e) {
             finalizeMatch(possibleMatch.getPlayer1(), possibleMatch.getPlayer2(), MatchResult.GAME_ENDER.TIMEOUT);
