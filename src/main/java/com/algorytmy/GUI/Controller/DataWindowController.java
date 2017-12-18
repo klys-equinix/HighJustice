@@ -214,7 +214,7 @@ public class DataWindowController {
 
     @FXML
     private void onAutomaticSimulationSelected(ActionEvent actionEvent) {
-        autoGameRunner.runAllGames(null);
+        autoGameRunner.runAllGames(null, null);
     }
 
     @FXML
@@ -237,11 +237,13 @@ public class DataWindowController {
             }
         }
         try {
-            gameService.createGame(mtch, null);
+            gameService.createGame(mtch, null, null);
             mtch.setMatchStatus(MatchStatus.IN_PROGRESS);
             matchList.set(i, mtch);
         } catch (ExecutionException executionExcepetion) {
             showErrorDialog("There was a problem when trying to run program!", executionExcepetion.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         contextMenu.hide();

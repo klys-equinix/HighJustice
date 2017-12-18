@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -45,7 +46,7 @@ public class JudgeApplicationTests {
 //        while(gameService.nextMove() != null) {}
 //        gameService.getCurrentMatch().toString();
 //        gameService.endMatch();
-        autoGameRunner.runAllGames(null);
+        autoGameRunner.runAllGames(null, new File("C:\\Users\\Konrad\\Desktop\\Archive\\Judge\\src\\main\\resources\\obstacles.txt"));
     }
 
 }

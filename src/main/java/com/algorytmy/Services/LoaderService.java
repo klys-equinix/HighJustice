@@ -57,6 +57,17 @@ public class LoaderService {
 
     }
 
+    public Match.FIELD_VALUE[][] loadObstacles(File obstacleFile, Match.FIELD_VALUE[][] board) throws IOException {
+        BufferedReader fileReader = new BufferedReader(new FileReader(obstacleFile));
+        String line = "";
+        while((line = fileReader.readLine()) != null) {
+            Move move = new Move(line, null);
+            board[move.getX1()][move.getY1()] = Match.FIELD_VALUE.OBSTACLE;
+            board[move.getX2()][move.getY2()] = Match.FIELD_VALUE.OBSTACLE;
+        }
+        return board;
+    }
+
     private void parseDirectory(File directory) throws FileNotFoundException {
         File[] files = directory.listFiles();
         Player player = new Player();
