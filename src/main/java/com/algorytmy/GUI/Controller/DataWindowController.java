@@ -245,7 +245,7 @@ public class DataWindowController {
 
     @FXML
     private void onAutomaticSimulationSelected(ActionEvent actionEvent) {
-        autoGameRunner.runAllGames(null);
+        autoGameRunner.runAllGames(boardSize);
     }
 
     @FXML
