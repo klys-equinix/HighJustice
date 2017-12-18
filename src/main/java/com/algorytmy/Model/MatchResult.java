@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Konrad Łyś on 06.11.2017 for usage in judge.
@@ -30,6 +32,9 @@ public class MatchResult {
     @ManyToOne
     @NotNull
     private Player loser;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    List<Move> moveList = new ArrayList<>();
 
     @NotNull
     private GAME_ENDER gameEnder;

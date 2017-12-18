@@ -237,7 +237,7 @@ public class DataWindowController {
             }
         }
         try {
-            gameService.createGame(mtch);
+            gameService.createGame(mtch, null);
             mtch.setMatchStatus(MatchStatus.IN_PROGRESS);
             matchList.set(i, mtch);
         } catch (ExecutionException executionExcepetion) {

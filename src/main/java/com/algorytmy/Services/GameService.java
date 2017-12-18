@@ -37,9 +37,10 @@ public class GameService {
      * @return new Match with created Board
      * @throws IOException if one of the players cannot be executed
      */
-    public Match createGame(Match possibleMatch) throws ExecutionException {
+    public Match createGame(Match possibleMatch, Integer boardSize) throws ExecutionException {
         this.currentMatch = possibleMatch;
         currentMatch.setMatchStatus(MatchStatus.IN_PROGRESS);
+        currentMatch.setMatchResult(new MatchResult());
         currentPlayer = possibleMatch.getPlayer1();
         otherPlayer = possibleMatch.getPlayer2();
         try {
@@ -54,7 +55,9 @@ public class GameService {
             finalizeMatch(possibleMatch.getPlayer1(), possibleMatch.getPlayer2(), MatchResult.GAME_ENDER.CANNOT_EXECUTE);
             throw new ExecutionException("Cannot run player executable", otherPlayer);
         }
-        Integer boardSize = IntStream.generate(() -> ThreadLocalRandom.current().nextInt(100, 999)).filter(n -> n % 2 == 1).limit(1).boxed().toArray(Integer[]::new)[0];
+        if(boardSize == null) {
+            boardSize = IntStream.generate(() -> ThreadLocalRandom.current().nextInt(100, 999)).filter(n -> n % 2 == 1).limit(1).boxed().toArray(Integer[]::new)[0];
+        }
         possibleMatch.createBoard(boardSize);
         try {
             if (!writeAndRead(boardSize.toString(), currentPlayer).equals("OK"))
@@ -134,9 +137,10 @@ public class GameService {
     private void finalizeMatch(Player winner, Player loser, MatchResult.GAME_ENDER gameEnder) {
         logger.debug("GAME_ENDER" + " :" + gameEnder + " loser: " + loser.getName() + " winner: " + winner.getName());
         isFirstMove = true;
-        MatchResult matchResult = new MatchResult(winner, loser, gameEnder);
+        currentMatch.getMatchResult().setGameEnder(gameEnder);
+        currentMatch.getMatchResult().setLoser(loser);
+        currentMatch.getMatchResult().setWinner(winner);
         currentMatch.setMatchStatus(MatchStatus.ENDED);
-        currentMatch.setMatchResult(matchResult);
 
         Match currentCopy = currentMatch;
         endMatch();
@@ -158,6 +162,7 @@ public class GameService {
     }
 
     private Move validateMove(Move move) {
+        currentMatch.getMatchResult().getMoveList().add(move);
         if (move.getX1() < currentMatch.getBoard()[0].length && move.getX1() > 0 &&
                 move.getY1() < currentMatch.getBoard().length && move.getY1() > 0 &&
                 move.getX2() < currentMatch.getBoard()[0].length && move.getX2() > 0 &&

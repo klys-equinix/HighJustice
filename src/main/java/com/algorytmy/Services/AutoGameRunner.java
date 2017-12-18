@@ -30,7 +30,7 @@ public class AutoGameRunner {
     public void runAllGames() {
         possibleMatches.forEach(match -> {
             try {
-                gameService.createGame(match);
+                gameService.createGame(match, null);
             } catch (ExecutionException executionException) {
                 logger.error(executionException.getGuilty().toString());
             }

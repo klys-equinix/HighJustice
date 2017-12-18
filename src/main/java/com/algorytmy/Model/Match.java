@@ -6,6 +6,7 @@ import com.algorytmy.Services.MatchEndListener;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
