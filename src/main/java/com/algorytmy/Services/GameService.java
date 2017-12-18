@@ -196,7 +196,7 @@ public class GameService {
         ExecutorService executor = Executors.newFixedThreadPool(1);
         Future<String> future = executor.submit(() -> scanner.nextLine());
         try {
-            line = future.get(1000, TimeUnit.SECONDS);
+            line = future.get(500, TimeUnit.SECONDS);
         } catch (InterruptedException | java.util.concurrent.ExecutionException | TimeoutException e1) {
             throw new ExecutionException("Read timeout", player);
         }
