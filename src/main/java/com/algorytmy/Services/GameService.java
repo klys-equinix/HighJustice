@@ -84,7 +84,6 @@ public class GameService {
      */
     public Move nextMove() {
         if (isFirstMove) {
-            currentMatch.setMatchResult(new MatchResult());
             this.isFirstMove = false;
             try {
                 Move firstMove = validateMove(new Move(writeAndRead("start", currentPlayer),

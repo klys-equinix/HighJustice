@@ -27,7 +27,7 @@ public class Match {
     private ArrayList<Move> player2Moves;
     private Player player1;
     private Player player2;
-    private MatchResult matchResult;
+    private MatchResult matchResult = new MatchResult();
 
     private ObjectProperty<MatchStatus> matchStatusProperty = new SimpleObjectProperty<>();
 
