@@ -3,16 +3,27 @@ package com.algorytmy.Model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
 /**
  * Created by Konrad Łyś on 06.11.2017 for usage in judge.
  */
+@Entity
 @Data
 @AllArgsConstructor
 public class Move {
+    @Id
+    @GeneratedValue
+    private Long id;
+
     private Integer x1;
     private Integer y1;
     private Integer x2;
     private Integer y2;
+    @ManyToOne
     private Player player;
 
     public String toString() {
