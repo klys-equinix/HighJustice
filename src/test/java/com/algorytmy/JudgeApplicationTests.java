@@ -45,7 +45,7 @@ public class JudgeApplicationTests {
 //        while(gameService.nextMove() != null) {}
 //        gameService.getCurrentMatch().toString();
 //        gameService.endMatch();
-        autoGameRunner.runAllGames();
+        autoGameRunner.runAllGames(null);
     }
 
 }

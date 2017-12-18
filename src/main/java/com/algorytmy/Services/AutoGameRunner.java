@@ -27,10 +27,10 @@ public class AutoGameRunner {
      * Only final statistics are to be displayed.
      * Single threaded for now because of issues.
      */
-    public void runAllGames() {
+    public void runAllGames(Integer boardSize) {
         possibleMatches.forEach(match -> {
             try {
-                gameService.createGame(match, null);
+                gameService.createGame(match, boardSize);
             } catch (ExecutionException executionException) {
                 logger.error(executionException.getGuilty().toString());
             }
