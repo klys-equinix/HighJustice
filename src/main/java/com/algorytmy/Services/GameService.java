@@ -25,6 +25,9 @@ public class GameService {
     @Autowired
     PlayerRepository playerRepository;
 
+    @Autowired
+    LoaderService loaderService;
+
     private Match currentMatch;
     private Player currentPlayer;
     private Player otherPlayer;
@@ -37,7 +40,7 @@ public class GameService {
      * @return new Match with created Board
      * @throws IOException if one of the players cannot be executed
      */
-    public Match createGame(Match possibleMatch, Integer boardSize) throws ExecutionException {
+    public Match createGame(Match possibleMatch, Integer boardSize, File obstacleFile) throws ExecutionException, IOException {
         this.currentMatch = possibleMatch;
         currentMatch.setMatchStatus(MatchStatus.IN_PROGRESS);
         currentPlayer = possibleMatch.getPlayer1();
@@ -48,16 +51,25 @@ public class GameService {
             finalizeMatch(possibleMatch.getPlayer2(), possibleMatch.getPlayer1(), MatchResult.GAME_ENDER.CANNOT_EXECUTE);
             throw new ExecutionException("Cannot run player executable", currentPlayer);
         }
+
         try {
             initiateProcess(otherPlayer.getPlayerExecutable());
         } catch (IOException e) {
             finalizeMatch(possibleMatch.getPlayer1(), possibleMatch.getPlayer2(), MatchResult.GAME_ENDER.CANNOT_EXECUTE);
             throw new ExecutionException("Cannot run player executable", otherPlayer);
         }
+
         if(boardSize == null) {
             boardSize = IntStream.generate(() -> ThreadLocalRandom.current().nextInt(100, 999)).filter(n -> n % 2 == 1).limit(1).boxed().toArray(Integer[]::new)[0];
         }
-        possibleMatch.createBoard(boardSize);
+
+        if(obstacleFile == null) {
+            possibleMatch.createBoard(boardSize);
+        } else {
+            possibleMatch.createEmptyBoard(boardSize);
+            possibleMatch.setBoard(loaderService.loadObstacles(obstacleFile, possibleMatch.getBoard()));
+        }
+
         try {
             if (!writeAndRead(boardSize.toString(), currentPlayer).equals("OK"))
                 throw new IOException();

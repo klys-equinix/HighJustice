@@ -25,7 +25,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -248,7 +247,7 @@ public class DataWindowController {
 
     @FXML
     private void onAutomaticSimulationSelected(ActionEvent actionEvent) {
-        autoGameRunner.runAllGames(boardSize);
+        autoGameRunner.runAllGames(boardSize, null);
     }
 
     @FXML
@@ -271,11 +270,13 @@ public class DataWindowController {
             }
         }
         try {
-            gameService.createGame(mtch, boardSize);
+            gameService.createGame(mtch, boardSize, null);
             mtch.setMatchStatus(MatchStatus.IN_PROGRESS);
             matchList.set(i, mtch);
         } catch (ExecutionException executionExcepetion) {
             showErrorDialog("There was a problem when trying to run program!", executionExcepetion.toString());
+        } catch (IOException e) {
+            showErrorDialog("There was a problem when trying to run program!", e.toString());
         }
 
         contextMenu.hide();

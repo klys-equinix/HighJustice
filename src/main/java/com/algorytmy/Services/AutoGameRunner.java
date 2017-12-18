@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -27,12 +29,14 @@ public class AutoGameRunner {
      * Only final statistics are to be displayed.
      * Single threaded for now because of issues.
      */
-    public void runAllGames(Integer boardSize) {
+    public void runAllGames(Integer boardSize, File obstacleFile) {
         possibleMatches.forEach(match -> {
             try {
-                gameService.createGame(match, boardSize);
+                gameService.createGame(match, boardSize, obstacleFile);
             } catch (ExecutionException executionException) {
                 logger.error(executionException.getGuilty().toString());
+            } catch (IOException e) {
+                logger.error(e.getMessage());
             }
             while (gameService.nextMove() != null) ;
         });
