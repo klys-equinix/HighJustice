@@ -40,7 +40,6 @@ public class GameService {
     public Match createGame(Match possibleMatch, Integer boardSize) throws ExecutionException {
         this.currentMatch = possibleMatch;
         currentMatch.setMatchStatus(MatchStatus.IN_PROGRESS);
-        currentMatch.setMatchResult(new MatchResult());
         currentPlayer = possibleMatch.getPlayer1();
         otherPlayer = possibleMatch.getPlayer2();
         try {
@@ -85,6 +84,7 @@ public class GameService {
      */
     public Move nextMove() {
         if (isFirstMove) {
+            currentMatch.setMatchResult(new MatchResult());
             this.isFirstMove = false;
             try {
                 Move firstMove = validateMove(new Move(writeAndRead("start", currentPlayer),
