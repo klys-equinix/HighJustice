@@ -62,6 +62,8 @@ public class DataWindowController {
     private MenuItem openDirectoryMenuItem;
     @FXML
     private VBox container;
+    @FXML
+    private MenuItem boardSizeMenuItem;
 
     private ObservableList<Player> playerList;
     private ObservableList<Match> matchList;
@@ -173,6 +175,7 @@ public class DataWindowController {
         }
 
         boardSize = size;
+        boardSizeMenuItem.setText("Board size: "+size+" units");
 
         try {
             loaderService.loadPlayers(dir);
@@ -317,7 +320,7 @@ public class DataWindowController {
         alert.showAndWait();
     }
 
-    private String getHumanMatchResult(MatchResult mr) {
+    public static String getHumanMatchResult(MatchResult mr) {
         if(mr.getGameEnder() == null)
             return "";
 

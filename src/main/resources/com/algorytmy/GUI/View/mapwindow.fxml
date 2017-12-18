@@ -10,8 +10,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.Label?>
 <VBox fx:id="container" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.algorytmy.GUI.Controller.MapWindowController">
    <children>
+       <Label fx:id="statusLabel" text="Label" />
+       <Label fx:id="moveLabel" text="Label" />
       <ScrollPane pannable="true" VBox.vgrow="ALWAYS">
          <content>
             <Group>

@@ -35,6 +35,8 @@ public class HistoryWindowController {
     private Button zoomOutButton;
     @FXML
     private Label statusLabel;
+    @FXML
+    private Label moveLabel;
 
     private IntegerProperty zoom = new SimpleIntegerProperty(1);
 
@@ -42,7 +44,7 @@ public class HistoryWindowController {
     private MapDrawer md;
 
     private boolean initialized = false;
-    private static final int MAX_ZOOM = 3;
+    private static final int MAX_ZOOM = 10;
 
     private Match match;
 
@@ -57,6 +59,7 @@ public class HistoryWindowController {
         zoom.addListener((observable, oldValue, newValue) -> canvas.setImage(md.drawBoard(match.getBoard(), zoom.getValue())));
 
         previousButton.setDisable(true);
+        zoomOutButton.setDisable(true);
 
         initialized = true;
     }
@@ -79,29 +82,43 @@ public class HistoryWindowController {
 
         if(moveIterator == getMovesCount()-1)
             nextButton.setDisable(true);
-        previousButton.setDisable(false);
+        else
+            nextButton.setDisable(false);
+
+        if(moveIterator == 0)
+            previousButton.setDisable(true);
+        else
+            previousButton.setDisable(false);
 
         statusLabel.setText(getStatusString());
         canvas.setImage(md.drawBoard(match.getBoard(), zoom.getValue()));
+        moveLabel.setText(getMoveString(m));
     }
 
 
     @FXML
     private void showPreviousMove(ActionEvent ae) {
-        moveIterator--;
-
         // Oops. We need to remove one move!
         Move movePrev = match.getMatchResult().getMoveList().get(moveIterator);
         match.getBoard()[movePrev.getX1()][movePrev.getY1()] = Match.FIELD_VALUE.EMPTY;
         match.getBoard()[movePrev.getX2()][movePrev.getY2()] = Match.FIELD_VALUE.EMPTY;
 
         // Done!
+        moveIterator--;
 
         if(moveIterator == 0)
             previousButton.setDisable(true);
-        nextButton.setDisable(false);
+        else
+            previousButton.setDisable(false);
+
+        if(moveIterator == getMovesCount()-1)
+            nextButton.setDisable(true);
+        else
+            nextButton.setDisable(false);
+
         statusLabel.setText(getStatusString());
         canvas.setImage(md.drawBoard(match.getBoard(), zoom.getValue()));
+        moveLabel.setText(getMoveString(match.getMatchResult().getMoveList().get(moveIterator)));
     }
 
     @FXML
@@ -132,11 +149,12 @@ public class HistoryWindowController {
             }
         }
 
-        moveIterator = 0;
-
         Platform.runLater(() -> {
-            statusLabel.setText(getStatusString());
-            canvas.setImage(md.drawBoard(match.getBoard(), zoom.getValue()));
+            previousButton.setDisable(true);
+            zoomOutButton.setDisable(true);
+
+            moveIterator = -1;
+            showNextMove(null);
         });
     }
 
@@ -152,6 +170,13 @@ public class HistoryWindowController {
         StringBuilder sb = new StringBuilder("Match: ")
                 .append(match.getPlayer1().getName()).append(" : ").append(match.getPlayer2().getName())
                 .append(" (Move ").append(getMoveNumber()).append(" of ").append(getMovesCount()).append(")");
+        return sb.toString();
+    }
+
+    private String getMoveString(Move m) {
+        StringBuilder sb = new StringBuilder("Move of ").append(m.getPlayer().getName())
+                .append(" (").append(m.getX1()).append(", ").append(m.getY1()).append(") and (")
+                .append(m.getX2()).append(", ").append(m.getY2()).append(")");
         return sb.toString();
     }
 }

@@ -24,6 +24,7 @@
           <Menu mnemonicParsing="false" text="Simulation">
                <items>
                   <MenuItem fx:id="automaticSimulationMenuItem" disable="true" mnemonicParsing="false" onAction="#onAutomaticSimulationSelected" text="Run automatic simulation" />
+                   <MenuItem fx:id="boardSizeMenuItem" disable="true" mnemonicParsing="false" text="No board size selected!" />
                </items></Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>

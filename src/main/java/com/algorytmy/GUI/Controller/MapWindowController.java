@@ -13,6 +13,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ScrollEvent;
@@ -41,6 +42,10 @@ public class MapWindowController {
     private Button zoomInButton;
     @FXML
     private Button zoomOutButton;
+    @FXML
+    private Label statusLabel;
+    @FXML
+    private Label moveLabel;
 
     private IntegerProperty zoom = new SimpleIntegerProperty(1);
 
@@ -51,29 +56,28 @@ public class MapWindowController {
     private MapDrawer md;
 
     private boolean initialized = false;
-    private static final int MAX_ZOOM = 3;
+    private static final int MAX_ZOOM = 10;
 
     @FXML
     private void initialize() {
         redrawMap(zoom.getValue());
 
         nextStepButton.setOnAction(actionEvent -> {
-            gs.nextMove();
-            if(gs.getCurrentMatch() != null)
-                redrawMap(zoom.getValue());
+            Move m = gs.nextMove();
+            afterMove(m);
         });
 
         twoStepButton.setOnAction(actionEvent -> {
+            Move m = null;
             for (int i = 0; i < 5; i++)
-                gs.nextMove();
-            if(gs.getCurrentMatch() != null)
-                redrawMap(zoom.getValue());
+                m = gs.nextMove();
+            afterMove(m);
         });
 
         endButton.setOnAction(actionEvent -> {
-            while (gs.nextMove() != null) { }
-            if(gs.getCurrentMatch() != null)
-                redrawMap(zoom.getValue());
+            Move m;
+            while ((m = gs.nextMove()) != null) { }
+            afterMove(m);
         });
 
         gs.getCurrentMatch().addMathEndListener(mtch -> {
@@ -82,7 +86,7 @@ public class MapWindowController {
 
         zoom.addListener((observable, oldValue, newValue) -> redrawMap(newValue.intValue()));
 
-        zoomInButton.setDisable(true);
+        zoomOutButton.setDisable(true);
 
         initialized = true;
     }
@@ -100,6 +104,9 @@ public class MapWindowController {
             ((Stage) container.getScene().getWindow()).setTitle("HighJustice - map drawer");
 
             redrawMap(zoom.getValue());
+
+            statusLabel.setText(getStatusString(gs.getCurrentMatch()));
+            moveLabel.setText("Waiting for first move...");
         });
     }
 
@@ -134,5 +141,34 @@ public class MapWindowController {
             zoomOutButton.setDisable(true);
         else
             zoomInButton.setDisable(false);
+    }
+
+    private String getStatusString(Match match) {
+        StringBuilder sb = new StringBuilder("Match: ")
+                .append(match.getPlayer1().getName()).append(" : ").append(match.getPlayer2().getName());
+        return sb.toString();
+    }
+
+    private String getMoveString(Move m) {
+        StringBuilder sb;
+        if(m == null) {
+            sb = new StringBuilder("Match ended with result: ")
+                    .append(DataWindowController.getHumanMatchResult(gs.getCurrentMatch().getMatchResult()));
+            return sb.toString();
+        }
+        sb = new StringBuilder("Move of ").append(m.getPlayer().getName())
+                .append(" (").append(m.getX1()).append(", ").append(m.getY1()).append(") and (")
+                .append(m.getX2()).append(", ").append(m.getY2()).append(")");
+        return sb.toString();
+    }
+
+    private void afterMove(Move m) {
+        if(gs.getCurrentMatch() != null) {
+            redrawMap(zoom.getValue());
+            statusLabel.setText(getStatusString(gs.getCurrentMatch()));
+            moveLabel.setText(getMoveString(m));
+        } else {
+            moveLabel.setText("Match ended!");
+        }
     }
 }
