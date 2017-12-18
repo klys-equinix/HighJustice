@@ -169,7 +169,7 @@ public class DataWindowController {
         } else
             return;
 
-        if(size <= 0 || size > 999) {
+        if(size <= 0 || size > 999 || size%2 == 0) {
             showWarningDialog("Wrong map size entered!", "Try again!");
             return;
         }
