@@ -46,7 +46,7 @@ public class JudgeApplicationTests {
 //        while(gameService.nextMove() != null) {}
 //        gameService.getCurrentMatch().toString();
 //        gameService.endMatch();
-        autoGameRunner.runAllGames(null, new File("C:\\Users\\Konrad\\Desktop\\Archive\\Judge\\src\\main\\resources\\obstacles.txt"));
+        autoGameRunner.runAllGames(10, new File("C:\\Users\\Konrad\\Desktop\\Archive\\Judge\\src\\main\\resources\\obstacles.txt"));
     }
 
 }
