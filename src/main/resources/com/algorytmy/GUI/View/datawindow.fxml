@@ -50,6 +50,7 @@
                         <ContextMenu fx:id="contextMenu">
                           <items>
                             <MenuItem mnemonicParsing="false" onAction="#onManualSelected" text="Run selected match!" />
+                              <MenuItem mnemonicParsing="false" onAction="#onHistorySelected" text="Show history" />
                           </items>
                         </ContextMenu>
                      </contextMenu>

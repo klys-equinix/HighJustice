@@ -1,6 +1,7 @@
 package com.algorytmy.GUI.Controller;
 
 import com.algorytmy.Exceptions.ExecutionException;
+import com.algorytmy.GUI.View.HistoryWindowView;
 import com.algorytmy.GUI.View.MapWindowView;
 import com.algorytmy.JudgeApplication;
 import com.algorytmy.Model.*;
@@ -24,9 +25,11 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Optional;
 
 @FXMLController
 public class DataWindowController {
@@ -65,6 +68,8 @@ public class DataWindowController {
 
     @Autowired
     private MapWindowController mwc;
+    @Autowired
+    private HistoryWindowController hwc;
 
     @Autowired
     private AutoGameRunner autoGameRunner;
@@ -141,6 +146,18 @@ public class DataWindowController {
         dirChooser.setTitle("Choose directory");
         File dir = dirChooser.showDialog(stg);
         if (dir == null)
+            return;
+
+        TextInputDialog dialog = new TextInputDialog("10");
+        dialog.setTitle("HighJustice - size of the map");
+        dialog.setHeaderText("It's suggested to choose map size lower than 1000 units!");
+        dialog.setContentText("Please enter desired map size:");
+
+        Optional<String> result = dialog.showAndWait();
+        Integer size;
+        if (result.isPresent()){
+            size = Integer.getInteger(result.get());
+        } else
             return;
 
         try {
@@ -245,10 +262,9 @@ public class DataWindowController {
         }
 
         contextMenu.hide();
-        if (mwc.isInitialized())
-            mwc.onOpen();
-        JudgeApplication.showView(MapWindowView.class, Modality.APPLICATION_MODAL);
+
         mwc.onOpen();
+        JudgeApplication.showView(MapWindowView.class, Modality.APPLICATION_MODAL);
 
         automaticSimulationMenuItem.setDisable(true);
     }
@@ -260,6 +276,17 @@ public class DataWindowController {
         alert.setHeaderText("High Justice");
         alert.setContentText("Konrad Łyś - judge logic\nSzymon Chmal - GUI\nPowered by Spring and JavaFX!");
         alert.show();
+    }
+
+    @FXML
+    private void onHistorySelected(ActionEvent actionEvent) {
+        contextMenu.hide();
+        Match mtch = matchTable.getSelectionModel().getSelectedItem();
+        if (mtch.getMatchStatus() != MatchStatus.ENDED)
+            return;
+
+        hwc.setMatch(mtch);
+        JudgeApplication.showView(HistoryWindowView.class, Modality.APPLICATION_MODAL);
     }
 
     private void showErrorDialog(String header, String content) {
@@ -277,6 +304,9 @@ public class DataWindowController {
     }
 
     private String getHumanMatchResult(MatchResult mr) {
+        if(mr.getGameEnder() == null)
+            return "";
+
         StringBuilder sb = new StringBuilder();
         if (mr.getGameEnder() != MatchResult.GAME_ENDER.DEFAULT) {
             sb.append(mr.getGameEnder()).append(" : ").append(mr.getLoser().getName());

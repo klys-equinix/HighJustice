@@ -125,7 +125,7 @@ public class GameService {
         otherPlayer.getPlayerExecutable().getWriter().println("stop");
         MatchResult matchResult = currentMatch.getMatchResult();
         matchResultRepository.save(matchResult);
-        currentMatch = null;
+        //currentMatch = null;
         matchResult.getWinner().addToScore();
         playerRepository.save(matchResult.getWinner());
         playerRepository.save(matchResult.getLoser());
