@@ -225,7 +225,7 @@ public class GameService {
             throw new ExecutionException("Read timeout", player);
         }
         logger.debug(player.getName() + " :" + line);
-        return line;
+        return line.replace("X", "x");
     }
 
     private void closePlayerProcess(Player player) {
