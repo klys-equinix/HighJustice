@@ -10,7 +10,6 @@
 
 	<name>judge</name>
 	<description>Judge project</description>
-
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>

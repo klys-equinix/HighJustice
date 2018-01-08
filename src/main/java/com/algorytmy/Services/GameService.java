@@ -187,10 +187,10 @@ public class GameService {
 
     private Move validateMove(Move move) {
         currentMatch.getMatchResult().getMoveList().add(move);
-        if (move.getX1() < currentMatch.getBoard()[0].length && move.getX1() > 0 &&
-                move.getY1() < currentMatch.getBoard().length && move.getY1() > 0 &&
-                move.getX2() < currentMatch.getBoard()[0].length && move.getX2() > 0 &&
-                move.getY2() < currentMatch.getBoard().length && move.getY2() > 0) {
+        if (move.getX1() < currentMatch.getBoard()[0].length && move.getX1() >= 0 &&
+                move.getY1() < currentMatch.getBoard().length && move.getY1() >= 0 &&
+                move.getX2() < currentMatch.getBoard()[0].length && move.getX2() >= 0 &&
+                move.getY2() < currentMatch.getBoard().length && move.getY2() >= 0) {
             if(currentMatch.getBoard()[move.getX1()][move.getY1()].equals(Match.FIELD_VALUE.EMPTY) &&
                     currentMatch.getBoard()[move.getX2()][move.getY2()].equals(Match.FIELD_VALUE.EMPTY)) {
                 Match.FIELD_VALUE[][] board = currentMatch.getBoard();
