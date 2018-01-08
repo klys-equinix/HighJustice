@@ -84,14 +84,14 @@ public class GameService {
         String initMessage = builder.toString();
 
         try {
-            if (!writeAndRead(initMessage, currentPlayer).equals("OK"))
+            if (!writeAndRead(initMessage, currentPlayer).equalsIgnoreCase("OK"))
                 throw new IOException();
         } catch (IOException e) {
             finalizeMatch(possibleMatch.getPlayer2(), possibleMatch.getPlayer1(), MatchResult.GAME_ENDER.TIMEOUT);
             throw new ExecutionException("Player1 not responding", currentPlayer);
         }
         try {
-            if (!writeAndRead(initMessage, otherPlayer).equals("OK"))
+            if (!writeAndRead(initMessage, otherPlayer).equalsIgnoreCase("OK"))
                 throw new IOException();
         } catch (IOException e) {
             finalizeMatch(possibleMatch.getPlayer1(), possibleMatch.getPlayer2(), MatchResult.GAME_ENDER.TIMEOUT);
@@ -218,9 +218,13 @@ public class GameService {
         String line = "";
         Scanner scanner = new Scanner(player.getPlayerExecutable().getProcess().getInputStream());
         ExecutorService executor = Executors.newFixedThreadPool(1);
+        int timeLimit = 500;
+        if(isFirstMove) {
+            timeLimit = 1000;
+        }
         Future<String> future = executor.submit(() -> scanner.nextLine());
         try {
-            line = future.get(500, TimeUnit.SECONDS);
+            line = future.get(timeLimit, TimeUnit.SECONDS);
         } catch (InterruptedException | java.util.concurrent.ExecutionException | TimeoutException e1) {
             throw new ExecutionException("Read timeout", player);
         }
