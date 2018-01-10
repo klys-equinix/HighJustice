@@ -25,7 +25,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Optional;
@@ -169,7 +172,7 @@ public class DataWindowController {
         } else
             return;
 
-        if(size <= 0 || size > 999 || size%2 == 0) {
+        if (size <= 3 || size > 999 || size % 2 == 0) {
             showWarningDialog("Wrong map size entered!", "Try again!");
             return;
         }

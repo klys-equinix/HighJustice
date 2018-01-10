@@ -73,11 +73,18 @@ public class HistoryWindowController {
         Move m = match.getMatchResult().getMoveList().get(moveIterator);
 
         // Adding move so nothing to be removed
-        match.getBoard()[m.getX1()][m.getY1()] =
-                m.getPlayer() == match.getPlayer1() ? Match.FIELD_VALUE.P1 : Match.FIELD_VALUE.P2;
+        System.out.println(match.getBoard().length);
+        if (m.getX1() >= 0 && m.getX1() < match.getBoard().length
+                && m.getY1() >= 0 && m.getY1() < match.getBoard().length) {
+            match.getBoard()[m.getX1()][m.getY1()] =
+                    m.getPlayer() == match.getPlayer1() ? Match.FIELD_VALUE.P1 : Match.FIELD_VALUE.P2;
+        }
 
-        match.getBoard()[m.getX2()][m.getY2()] =
-                m.getPlayer() == match.getPlayer1() ? Match.FIELD_VALUE.P1 : Match.FIELD_VALUE.P2;
+        if (m.getX2() >= 0 && m.getX2() < match.getBoard().length
+                && m.getY2() >= 0 && m.getY2() < match.getBoard().length) {
+            match.getBoard()[m.getX2()][m.getY2()] =
+                    m.getPlayer() == match.getPlayer1() ? Match.FIELD_VALUE.P1 : Match.FIELD_VALUE.P2;
+        }
 
         if(moveIterator == getMovesCount()-1)
             nextButton.setDisable(true);
@@ -99,8 +106,14 @@ public class HistoryWindowController {
     private void showPreviousMove(ActionEvent ae) {
         // Oops. We need to remove one move!
         Move movePrev = match.getMatchResult().getMoveList().get(moveIterator);
-        match.getBoard()[movePrev.getX1()][movePrev.getY1()] = Match.FIELD_VALUE.EMPTY;
-        match.getBoard()[movePrev.getX2()][movePrev.getY2()] = Match.FIELD_VALUE.EMPTY;
+        if (movePrev.getX1() >= 0 && movePrev.getX1() < match.getBoard().length
+                && movePrev.getY1() >= 0 && movePrev.getY1() < match.getBoard().length) {
+            match.getBoard()[movePrev.getX1()][movePrev.getY1()] = Match.FIELD_VALUE.EMPTY;
+        }
+        if (movePrev.getX2() >= 0 && movePrev.getX2() < match.getBoard().length
+                && movePrev.getY2() >= 0 && movePrev.getY2() < match.getBoard().length) {
+            match.getBoard()[movePrev.getX2()][movePrev.getY2()] = Match.FIELD_VALUE.EMPTY;
+        }
 
         // Done!
         moveIterator--;
