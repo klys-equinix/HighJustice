@@ -234,7 +234,7 @@ public class GameService {
 
     private void closePlayerProcess(Player player) {
         player.getPlayerExecutable().getWriter().close();
-        player.getPlayerExecutable().getProcess().destroy();
+        player.getPlayerExecutable().getProcess().destroyForcibly();
     }
 
     private void switchPlayers() {
