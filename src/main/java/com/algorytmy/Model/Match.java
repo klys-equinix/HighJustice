@@ -79,5 +79,15 @@ public class Match {
     public String toString() {
         return player1.getName() + " vs " + player2.getName();
     }
+
+    @Override
+    public boolean equals(Object match) {
+        Match match1 = (Match) match;
+        if((this.getPlayer1().equals(((Match) match).getPlayer1()) || this.getPlayer1().equals(((Match) match).getPlayer2()))
+                && (this.getPlayer2().equals(((Match) match).getPlayer2()) || this.getPlayer2().equals(((Match) match).getPlayer1()))) {
+            return true;
+        }
+        return false;
+    }
     public void addMathEndListener(MatchEndListener matchEndListener) {this.matchEndListeners.add(matchEndListener);}
 }

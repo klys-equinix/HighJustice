@@ -5,6 +5,7 @@ import com.algorytmy.Model.Match;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -29,6 +30,7 @@ public class AutoGameRunner {
      * Only final statistics are to be displayed.
      * Single threaded for now because of issues.
      */
+    @Async
     public void runAllGames(Integer boardSize, File obstacleFile) {
         possibleMatches.forEach(match -> {
             try {
@@ -41,4 +43,5 @@ public class AutoGameRunner {
             while (gameService.nextMove() != null) ;
         });
     }
+
 }

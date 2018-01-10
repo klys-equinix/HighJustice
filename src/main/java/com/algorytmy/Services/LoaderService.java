@@ -5,6 +5,7 @@ import com.algorytmy.Model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -28,6 +29,9 @@ public class LoaderService {
     @Autowired
     private ArrayList<Match> possibleMatches;
 
+    @Value("${game.singlegame: false}")
+    private boolean singleGameMode;
+
     public void loadPlayers(File playersFolder) throws IOException {
         File[] directories = playersFolder.listFiles(file -> file.isDirectory());
         if(directories.length == 0) {
@@ -50,7 +54,11 @@ public class LoaderService {
                     match.setPlayer1(player);
                     match.setPlayer2(player1);
                     match.setMatchStatus(MatchStatus.PENDING);
-                    possibleMatches.add(match);
+                    if(!singleGameMode) {
+                        possibleMatches.add(match);
+                    } else if (!possibleMatches.contains(match)){
+                        possibleMatches.add(match);
+                    }
                 }
             });
         });
