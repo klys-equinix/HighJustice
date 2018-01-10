@@ -1,43 +1,37 @@
 package com.algorytmy.GUI.Utility;
 
 import com.algorytmy.Model.Match;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.WritableImage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.Random;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 @Component
 public class MapDrawer {
-    public void drawBoard(GraphicsContext gc, Match.FIELD_VALUE[][] board) {
-        /*
-        * Assuming board is n by n
-        */
+    private static final Logger logger = LoggerFactory.getLogger(MapDrawer.class);
+
+    public WritableImage drawBoard(Match.FIELD_VALUE[][] board, int zoom) {
+        BufferedImage buff = new BufferedImage(board.length*2*zoom, board.length*2*zoom, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = (Graphics2D) buff.getGraphics();
+        g.scale(zoom, zoom);
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, board.length*2, board.length*2);
+
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
-                gc.setFill(getEntityColor(board[i][j]));
-                gc.fillRect(i, j, 1, 1);
+                g.setColor(getEntityColor(board[i][j]));
+                if(board[i][j] == Match.FIELD_VALUE.P1)
+                    System.out.println("P1");
+                g.fillRect(i*2, j*2, 1, 1);
             }
         }
-    }
 
-    public Match.FIELD_VALUE[][] randomizeBoard() {
-        Match.FIELD_VALUE[][] board = new Match.FIELD_VALUE[1000][1000];
-        Random rand = new Random();
-        for (int i = 0; i < 1000; i++)
-            for (int j = 0; j < 1000; j++) {
-                int r = rand.nextInt(4);
-                if (r == 1)
-                    board[i][j] = Match.FIELD_VALUE.EMPTY;
-                else if (r == 2)
-                    board[i][j] = Match.FIELD_VALUE.OBSTACLE;
-                else if (r == 3)
-                    board[i][j] = Match.FIELD_VALUE.P1;
-                else
-                    board[i][j] = Match.FIELD_VALUE.P2;
-
-            }
-        return board;
+        logger.info("Image of board has been generated.");
+        return SwingFXUtils.toFXImage(buff, null);
     }
 
     private Color getEntityColor(Match.FIELD_VALUE fv) {

@@ -84,14 +84,14 @@ public class GameService {
         String initMessage = builder.toString();
 
         try {
-            if (!writeAndRead(initMessage, currentPlayer).equals("OK"))
+            if (!writeAndRead(initMessage, currentPlayer).equalsIgnoreCase("OK"))
                 throw new IOException();
         } catch (IOException e) {
             finalizeMatch(possibleMatch.getPlayer2(), possibleMatch.getPlayer1(), MatchResult.GAME_ENDER.TIMEOUT);
             throw new ExecutionException("Player1 not responding", currentPlayer);
         }
         try {
-            if (!writeAndRead(initMessage, otherPlayer).equals("OK"))
+            if (!writeAndRead(initMessage, otherPlayer).equalsIgnoreCase("OK"))
                 throw new IOException();
         } catch (IOException e) {
             finalizeMatch(possibleMatch.getPlayer1(), possibleMatch.getPlayer2(), MatchResult.GAME_ENDER.TIMEOUT);
@@ -150,7 +150,7 @@ public class GameService {
         otherPlayer.getPlayerExecutable().getWriter().println("stop");
         MatchResult matchResult = currentMatch.getMatchResult();
         matchResultRepository.save(matchResult);
-        currentMatch = null;
+        //currentMatch = null;
         matchResult.getWinner().addToScore();
         playerRepository.save(matchResult.getWinner());
         playerRepository.save(matchResult.getLoser());
@@ -187,10 +187,10 @@ public class GameService {
 
     private Move validateMove(Move move) {
         currentMatch.getMatchResult().getMoveList().add(move);
-        if (move.getX1() < currentMatch.getBoard()[0].length && move.getX1() > 0 &&
-                move.getY1() < currentMatch.getBoard().length && move.getY1() > 0 &&
-                move.getX2() < currentMatch.getBoard()[0].length && move.getX2() > 0 &&
-                move.getY2() < currentMatch.getBoard().length && move.getY2() > 0) {
+        if (move.getX1() < currentMatch.getBoard()[0].length && move.getX1() >= 0 &&
+                move.getY1() < currentMatch.getBoard().length && move.getY1() >= 0 &&
+                move.getX2() < currentMatch.getBoard()[0].length && move.getX2() >= 0 &&
+                move.getY2() < currentMatch.getBoard().length && move.getY2() >= 0) {
             if(currentMatch.getBoard()[move.getX1()][move.getY1()].equals(Match.FIELD_VALUE.EMPTY) &&
                     currentMatch.getBoard()[move.getX2()][move.getY2()].equals(Match.FIELD_VALUE.EMPTY)) {
                 Match.FIELD_VALUE[][] board = currentMatch.getBoard();
@@ -218,19 +218,23 @@ public class GameService {
         String line = "";
         Scanner scanner = new Scanner(player.getPlayerExecutable().getProcess().getInputStream());
         ExecutorService executor = Executors.newFixedThreadPool(1);
+        int timeLimit = 500;
+        if(isFirstMove) {
+            timeLimit = 1000;
+        }
         Future<String> future = executor.submit(() -> scanner.nextLine());
         try {
-            line = future.get(500, TimeUnit.SECONDS);
+            line = future.get(timeLimit, TimeUnit.SECONDS);
         } catch (InterruptedException | java.util.concurrent.ExecutionException | TimeoutException e1) {
             throw new ExecutionException("Read timeout", player);
         }
         logger.debug(player.getName() + " :" + line);
-        return line;
+        return line.replace("X", "x");
     }
 
     private void closePlayerProcess(Player player) {
         player.getPlayerExecutable().getWriter().close();
-        player.getPlayerExecutable().getProcess().destroy();
+        player.getPlayerExecutable().getProcess().destroyForcibly();
     }
 
     private void switchPlayers() {

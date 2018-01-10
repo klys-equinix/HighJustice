@@ -1,6 +1,7 @@
 package com.algorytmy.GUI.Controller;
 
 import com.algorytmy.Exceptions.ExecutionException;
+import com.algorytmy.GUI.View.HistoryWindowView;
 import com.algorytmy.GUI.View.MapWindowView;
 import com.algorytmy.JudgeApplication;
 import com.algorytmy.Model.*;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Optional;
 
 @FXMLController
 public class DataWindowController {
@@ -59,15 +61,22 @@ public class DataWindowController {
     private MenuItem openDirectoryMenuItem;
     @FXML
     private VBox container;
+    @FXML
+    private MenuItem boardSizeMenuItem;
 
     private ObservableList<Player> playerList;
     private ObservableList<Match> matchList;
 
     @Autowired
     private MapWindowController mwc;
+    @Autowired
+    private HistoryWindowController hwc;
 
     @Autowired
     private AutoGameRunner autoGameRunner;
+
+    private int boardSize;
+    private File obstacleFile;
 
     public DataWindowController() {
     }
@@ -143,6 +152,34 @@ public class DataWindowController {
         if (dir == null)
             return;
 
+        TextInputDialog dialog = new TextInputDialog("10");
+        dialog.setTitle("HighJustice - size of the map");
+        dialog.setHeaderText("It's suggested to choose map size lower than 1000 units!");
+        dialog.setContentText("Please enter desired map size:");
+
+        Optional<String> result = dialog.showAndWait();
+        Integer size;
+        if (result.isPresent()){
+            try {
+                size = Integer.valueOf(result.get());
+            } catch (NumberFormatException e) {
+                showWarningDialog("Wrong map size entered!", "Try again!");
+                return;
+            }
+        } else
+            return;
+
+        if(size <= 0 || size > 999 || size%2 == 0) {
+            showWarningDialog("Wrong map size entered!", "Try again!");
+            return;
+        }
+
+        boardSize = size;
+        boardSizeMenuItem.setText("Board size: "+size+" units");
+
+        dirChooser.setTitle("Choose obstacle file or cancel");
+        obstacleFile = dirChooser.showDialog(stg);
+
         try {
             loaderService.loadPlayers(dir);
         } catch (Exception e) {
@@ -214,7 +251,7 @@ public class DataWindowController {
 
     @FXML
     private void onAutomaticSimulationSelected(ActionEvent actionEvent) {
-        autoGameRunner.runAllGames(null, null);
+        autoGameRunner.runAllGames(boardSize, obstacleFile);
     }
 
     @FXML
@@ -237,20 +274,17 @@ public class DataWindowController {
             }
         }
         try {
-            gameService.createGame(mtch, null, null);
+            gameService.createGame(mtch, boardSize, obstacleFile);
             mtch.setMatchStatus(MatchStatus.IN_PROGRESS);
             matchList.set(i, mtch);
-        } catch (ExecutionException executionExcepetion) {
+        } catch (ExecutionException | IOException executionExcepetion) {
             showErrorDialog("There was a problem when trying to run program!", executionExcepetion.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
         contextMenu.hide();
-        if (mwc.isInitialized())
-            mwc.onOpen();
-        JudgeApplication.showView(MapWindowView.class, Modality.APPLICATION_MODAL);
+
         mwc.onOpen();
+        JudgeApplication.showView(MapWindowView.class, Modality.APPLICATION_MODAL);
 
         automaticSimulationMenuItem.setDisable(true);
     }
@@ -262,6 +296,17 @@ public class DataWindowController {
         alert.setHeaderText("High Justice");
         alert.setContentText("Konrad Łyś - judge logic\nSzymon Chmal - GUI\nPowered by Spring and JavaFX!");
         alert.show();
+    }
+
+    @FXML
+    private void onHistorySelected(ActionEvent actionEvent) {
+        contextMenu.hide();
+        Match mtch = matchTable.getSelectionModel().getSelectedItem();
+        if (mtch.getMatchStatus() != MatchStatus.ENDED)
+            return;
+
+        hwc.setMatch(mtch);
+        JudgeApplication.showView(HistoryWindowView.class, Modality.APPLICATION_MODAL);
     }
 
     private void showErrorDialog(String header, String content) {
@@ -278,7 +323,10 @@ public class DataWindowController {
         alert.showAndWait();
     }
 
-    private String getHumanMatchResult(MatchResult mr) {
+    public static String getHumanMatchResult(MatchResult mr) {
+        if(mr.getGameEnder() == null)
+            return "";
+
         StringBuilder sb = new StringBuilder();
         if (mr.getGameEnder() != MatchResult.GAME_ENDER.DEFAULT) {
             sb.append(mr.getGameEnder()).append(" : ").append(mr.getLoser().getName());

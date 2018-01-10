@@ -24,6 +24,7 @@
           <Menu mnemonicParsing="false" text="Simulation">
                <items>
                   <MenuItem fx:id="automaticSimulationMenuItem" disable="true" mnemonicParsing="false" onAction="#onAutomaticSimulationSelected" text="Run automatic simulation" />
+                   <MenuItem fx:id="boardSizeMenuItem" disable="true" mnemonicParsing="false" text="No board size selected!" />
                </items></Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
@@ -50,6 +51,7 @@
                         <ContextMenu fx:id="contextMenu">
                           <items>
                             <MenuItem mnemonicParsing="false" onAction="#onManualSelected" text="Run selected match!" />
+                              <MenuItem mnemonicParsing="false" onAction="#onHistorySelected" text="Show history" />
                           </items>
                         </ContextMenu>
                      </contextMenu>

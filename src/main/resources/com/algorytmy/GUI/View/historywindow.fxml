@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.ImageView?>
@@ -10,11 +11,10 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.control.Label?>
-<VBox fx:id="container" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.algorytmy.GUI.Controller.MapWindowController">
+<VBox fx:id="container" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.algorytmy.GUI.Controller.HistoryWindowController">
    <children>
-       <Label fx:id="statusLabel" text="Label" />
-       <Label fx:id="moveLabel" text="Label" />
+      <Label fx:id="statusLabel" text="Label" />
+      <Label fx:id="moveLabel" text="Label" />
       <ScrollPane pannable="true" VBox.vgrow="ALWAYS">
          <content>
             <Group>
@@ -31,11 +31,10 @@
         <items>
             <BorderPane maxHeight="30.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="625.0">
                <left>
-                  <HBox BorderPane.alignment="CENTER">
+                  <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Button fx:id="twoStepButton" mnemonicParsing="false" text="Skip 5 steps" />
-                        <Button fx:id="nextStepButton" mnemonicParsing="false" text="Next step" />
-                        <Button fx:id="endButton" mnemonicParsing="false" text="Skip all steps" />
+                        <Button fx:id="previousButton" mnemonicParsing="false" onAction="#showPreviousMove" text="Previous step" />
+                        <Button fx:id="nextButton" mnemonicParsing="false" onAction="#showNextMove" text="Next step" />
                      </children>
                   </HBox>
                </left>
