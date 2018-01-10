@@ -2,11 +2,13 @@ package com.algorytmy.Services;
 
 import com.algorytmy.Exceptions.ExecutionException;
 import com.algorytmy.Model.*;
+import lombok.Synchronized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.*;
 import java.util.Scanner;
 import java.util.concurrent.*;
@@ -143,6 +145,7 @@ public class GameService {
         }
     }
 
+    @Transactional
     public void endMatch() {
         logger.debug("system" + " :" + currentPlayer.getName() + " stop");
         currentPlayer.getPlayerExecutable().getWriter().println("stop");
