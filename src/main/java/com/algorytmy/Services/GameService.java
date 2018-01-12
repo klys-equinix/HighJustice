@@ -6,6 +6,7 @@ import lombok.Synchronized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -29,6 +30,9 @@ public class GameService {
 
     @Autowired
     LoaderService loaderService;
+
+    @Value("${game.initialdelay}")
+    Integer initialdelay;
 
     private Match currentMatch;
     private Player currentPlayer;
@@ -223,7 +227,7 @@ public class GameService {
         ExecutorService executor = Executors.newFixedThreadPool(1);
         int timeLimit = 500;
         if(isFirstMove) {
-            timeLimit = 1000;
+            timeLimit = initialdelay;
         }
         Future<String> future = executor.submit(() -> scanner.nextLine());
         try {

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Map;
@@ -76,6 +77,7 @@ public class LoaderService {
         return board;
     }
 
+    @Transactional
     private void parseDirectory(File directory) throws FileNotFoundException {
         File[] files = directory.listFiles();
         Player player = new Player();
