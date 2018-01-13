@@ -1,6 +1,5 @@
 package com.algorytmy.Services;
 
-import com.algorytmy.Exceptions.ExecutionException;
 import com.algorytmy.Model.*;
 import lombok.Data;
 import org.slf4j.Logger;
@@ -50,6 +49,7 @@ public class LoaderService {
      * This method will list all possible games in temporary storage - only completed games should be persisted
      */
     private void loadPossibleGames() {
+        possibleMatches.clear();
         playerExecutables.forEach((playerName, player) -> {
             playerExecutables.forEach((playerName1, player1) -> {
                 if (!playerName.equals(playerName1)) {

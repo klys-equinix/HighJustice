@@ -24,7 +24,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.PlatformTransactionManager;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -49,6 +52,11 @@ public class DataWindowController {
 
     private Stage stg;
 
+    @Autowired
+    private MatchResultRepository mrr;
+
+    @Autowired
+    private PlayerRepository pr;
 
     @FXML
     private MenuItem exportResultsMenuItem;
@@ -80,6 +88,11 @@ public class DataWindowController {
 
     private int boardSize;
     private File obstacleFile;
+
+    @Autowired
+    private PlatformTransactionManager txManager;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public DataWindowController() {
     }
@@ -149,13 +162,18 @@ public class DataWindowController {
 
     @FXML
     private void onOpenDirectorySelected(ActionEvent actionEvent) throws IOException {
+        mrr.deleteAll();
+        playerRepository.deleteAll();
+        playerList.clear();
+        matchList.clear();
+
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory");
         File dir = dirChooser.showDialog(stg);
         if (dir == null)
             return;
 
-        TextInputDialog dialog = new TextInputDialog("10");
+        TextInputDialog dialog = new TextInputDialog("13");
         dialog.setTitle("HighJustice - size of the map");
         dialog.setHeaderText("It's suggested to choose map size lower than 1000 units!");
         dialog.setContentText("Please enter desired map size:");
@@ -191,7 +209,6 @@ public class DataWindowController {
         }
 
         automaticSimulationMenuItem.setDisable(false);
-        openDirectoryMenuItem.setDisable(true);
 
         playerList.addAll(playerRepository.findAll());
         matchList.addAll(possibleMatches);
@@ -229,19 +246,20 @@ public class DataWindowController {
         try {
             bw = new BufferedWriter(new FileWriter(dir));
             sb.append("Tournament at ").append(Calendar.getInstance().getTime())
-                    .append("\n\n").append("Players : Points\n\n");
+                    .append(System.lineSeparator()).append(System.lineSeparator()).append("Players : Points")
+                    .append(System.lineSeparator()).append(System.lineSeparator());
             bw.write(sb.toString());
             sb.setLength(0);
             for (Player p : playerList) {
-                sb.append(p.getName()).append(" : ").append(p.getScore()).append("\n");
+                sb.append(p.getName()).append(" : ").append(p.getScore()).append(System.lineSeparator());
             }
             bw.write(sb.toString());
-            bw.write("\nMatches\n\n");
+            bw.write(System.lineSeparator() + "Matches" + System.lineSeparator() + System.lineSeparator());
             sb.setLength(0);
             for (Match m : matchList) {
-                sb.append(m.getPlayer1().getName()).append(" vs ").append(m.getPlayer2().getName()).append(" winner: ")
+                sb.append(m.getPlayer1().getName()).append(" vs ").append(m.getPlayer2().getName()).append("- winner: ")
                         .append(m.getMatchResult().getWinner().getName()).append(", reason: ")
-                        .append(m.getMatchResult().getGameEnder()).append("\n");
+                        .append(m.getMatchResult().getGameEnder()).append(System.lineSeparator());
             }
             bw.write(sb.toString());
             bw.flush();
@@ -288,8 +306,6 @@ public class DataWindowController {
 
         mwc.onOpen();
         JudgeApplication.showView(MapWindowView.class, Modality.APPLICATION_MODAL);
-
-        automaticSimulationMenuItem.setDisable(true);
     }
 
     @FXML
