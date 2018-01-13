@@ -80,7 +80,7 @@ public class LoaderService {
     }
 
     @Transactional
-    private void parseDirectory(File directory) throws FileNotFoundException {
+    public void parseDirectory(File directory) throws FileNotFoundException {
         File[] files = directory.listFiles();
         Player player = new Player();
         PlayerExecutable playerExecutable = new PlayerExecutable();
