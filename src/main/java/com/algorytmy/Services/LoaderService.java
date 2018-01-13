@@ -2,6 +2,7 @@ package com.algorytmy.Services;
 
 import com.algorytmy.Exceptions.ExecutionException;
 import com.algorytmy.Model.*;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.util.Map;
  * This service initially loads player executables and parses info.txt files
  */
 @Service
+@Data
 public class LoaderService {
     final Logger logger = LoggerFactory.getLogger(GameService.class);
 
