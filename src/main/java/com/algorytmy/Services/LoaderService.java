@@ -80,6 +80,9 @@ public class LoaderService {
                     BufferedReader fileReader = new BufferedReader(new FileReader(file));
                     player.setName(fileReader.readLine());
                     command = fileReader.readLine();
+                    if(command == null) {
+                        command = "";
+                    }
                 } catch (FileNotFoundException e) {
                     logger.error(e.getMessage());
                 } catch (IOException e) {
@@ -89,7 +92,7 @@ public class LoaderService {
                 path = file.getAbsolutePath();
             }
         }
-        if(command.isEmpty() || path.isEmpty()) {
+        if(path.isEmpty()) {
             throw new FileNotFoundException("Incorrect folder");
         }
         playerExecutable.setCommandLineExecution(command + " " + path);
