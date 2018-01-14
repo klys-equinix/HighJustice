@@ -182,10 +182,10 @@ public class GameService {
     private boolean noFreeSpaceLeft() {
         for(int i = 0; i < currentMatch.getBoard().length; i++) {
             for(int j = 0; i < currentMatch.getBoard().length; i++) {
-                if(i++ < currentMatch.getBoard().length && currentMatch.getBoard()[i][j].equals(Match.FIELD_VALUE.EMPTY) && currentMatch.getBoard()[i++][j].equals(Match.FIELD_VALUE.EMPTY)) {
+                if(i + 1 < currentMatch.getBoard().length && currentMatch.getBoard()[i][j].equals(Match.FIELD_VALUE.EMPTY) && currentMatch.getBoard()[i + 1][j].equals(Match.FIELD_VALUE.EMPTY)) {
                     return false;
                 }
-                if(j++ < currentMatch.getBoard().length && currentMatch.getBoard()[i][j].equals(Match.FIELD_VALUE.EMPTY) && currentMatch.getBoard()[i][j++].equals(Match.FIELD_VALUE.EMPTY)) {
+                if(j + 1 < currentMatch.getBoard().length && currentMatch.getBoard()[i][j].equals(Match.FIELD_VALUE.EMPTY) && currentMatch.getBoard()[i][j + 1].equals(Match.FIELD_VALUE.EMPTY)) {
                     return false;
                 }
             }
