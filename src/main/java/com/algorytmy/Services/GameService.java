@@ -2,7 +2,6 @@ package com.algorytmy.Services;
 
 import com.algorytmy.Exceptions.ExecutionException;
 import com.algorytmy.Model.*;
-import lombok.Synchronized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Scanner;
 import java.util.concurrent.*;
 import java.util.stream.IntStream;
@@ -117,7 +118,7 @@ public class GameService {
         if (isFirstMove) {
             this.isFirstMove = false;
             try {
-                Move firstMove = validateMove(new Move(writeAndRead("start", currentPlayer),
+                Move firstMove = validateMove(new Move(writeAndRead("START", currentPlayer),
                         currentPlayer));
                 if(firstMove != null) {
                     switchPlayers();
@@ -152,9 +153,9 @@ public class GameService {
     @Transactional
     public void endMatch() {
         logger.debug("system" + " :" + currentPlayer.getName() + " stop");
-        currentPlayer.getPlayerExecutable().getWriter().println("stop");
+        currentPlayer.getPlayerExecutable().getWriter().println("STOP");
         logger.debug("system" + " :" + otherPlayer.getName() + " stop");
-        otherPlayer.getPlayerExecutable().getWriter().println("stop");
+        otherPlayer.getPlayerExecutable().getWriter().println("STOP");
         MatchResult matchResult = currentMatch.getMatchResult();
         matchResultRepository.save(matchResult);
         //currentMatch = null;
