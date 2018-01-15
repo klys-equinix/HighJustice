@@ -16,7 +16,13 @@ import javax.validation.constraints.NotNull;
 public class Player {
 
     @NotNull
-    private Integer score = 0;
+    private Integer scoreDefault = 0;
+
+    @NotNull
+    private Integer scoreError = 0;
+
+    @NotNull
+    private Integer lostFromErrors = 0;
 
     @Id
     @Column(unique = true)
@@ -28,12 +34,14 @@ public class Player {
     @Transient
     Match.FIELD_VALUE playerSignature;
 
-    public Player(String name, Integer score) {
-        this.score = score;
-        this.name = name;
+    public void addToDefaultScore() {
+        this.scoreDefault += 1;
     }
 
-    public void addToScore() {
-        this.score += 1;
+    public void addToErrorScore() {
+        this.scoreError += 1;
     }
+
+    public void addToLostFromErrors() { this.lostFromErrors += 1; }
+
 }

@@ -159,7 +159,12 @@ public class GameService {
         MatchResult matchResult = currentMatch.getMatchResult();
         matchResultRepository.save(matchResult);
         //currentMatch = null;
-        matchResult.getWinner().addToScore();
+        if(matchResult.getGameEnder().equals(MatchResult.GAME_ENDER.DEFAULT)) {
+            matchResult.getWinner().addToDefaultScore();
+        } else {
+            matchResult.getWinner().addToErrorScore();
+            matchResult.getLoser().addToLostFromErrors();
+        }
         playerRepository.save(matchResult.getWinner());
         playerRepository.save(matchResult.getLoser());
         closePlayerProcess(currentPlayer);

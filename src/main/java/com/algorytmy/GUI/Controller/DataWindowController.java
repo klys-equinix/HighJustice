@@ -251,7 +251,8 @@ public class DataWindowController {
             bw.write(sb.toString());
             sb.setLength(0);
             for (Player p : playerList) {
-                sb.append(p.getName()).append(" : ").append(p.getScore()).append(System.lineSeparator());
+                //TODO adjust to new score counting
+                sb.append(p.getName()).append(" : ").append(p.getScoreDefault()).append(System.lineSeparator());
             }
             bw.write(sb.toString());
             bw.write(System.lineSeparator() + "Matches" + System.lineSeparator() + System.lineSeparator());
