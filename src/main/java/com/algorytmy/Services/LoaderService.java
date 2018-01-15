@@ -100,7 +100,8 @@ public class LoaderService {
                 } catch (IOException e) {
                     logger.error(e.getMessage());
                 }
-            } else {
+            }
+            else {
                 path = file.getAbsolutePath();
             }
         }
