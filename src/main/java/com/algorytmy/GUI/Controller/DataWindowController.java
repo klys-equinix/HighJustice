@@ -330,7 +330,7 @@ public class DataWindowController {
     }
 
     private void showErrorDialog(String header, String content) {
-        showErrorDialog(header, content);
+        showWarningDialog(header, content);
         stg.close();
     }
 
