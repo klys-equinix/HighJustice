@@ -24,6 +24,9 @@ public class Player {
     @NotNull
     private Integer lostFromErrors = 0;
 
+    @NotNull
+    private Integer lostFromDefault = 0;
+
     @Id
     @Column(unique = true)
     private String name;
@@ -43,5 +46,7 @@ public class Player {
     }
 
     public void addToLostFromErrors() { this.lostFromErrors += 1; }
+
+    public void addToLostFromDefault() { this.lostFromDefault += 1; }
 
 }
