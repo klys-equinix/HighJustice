@@ -161,6 +161,7 @@ public class GameService {
         //currentMatch = null;
         if(matchResult.getGameEnder().equals(MatchResult.GAME_ENDER.DEFAULT)) {
             matchResult.getWinner().addToDefaultScore();
+            matchResult.getLoser().addToLostFromDefault();
         } else {
             matchResult.getWinner().addToErrorScore();
             matchResult.getLoser().addToLostFromErrors();
