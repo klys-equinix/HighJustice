@@ -98,6 +98,7 @@ public class DataWindowController {
     }
 
     @FXML
+    @SuppressWarnings("unchecked")
     private void initialize() throws IOException {
         stg = JudgeApplication.getStage();
         playerList = FXCollections.observableArrayList();
@@ -108,10 +109,16 @@ public class DataWindowController {
         matchTable.setItems(matchList);
 
         TableColumn<Player, String> playerNameColumn = (TableColumn<Player, String>) playersTable.getColumns().get(0);
-        TableColumn<Player, Integer> playerPointsColumn = (TableColumn<Player, Integer>) playersTable.getColumns().get(1);
+        TableColumn<Player, Integer> playerWinsColumn = (TableColumn<Player, Integer>) playersTable.getColumns().get(1);
+        TableColumn<Player, Integer> playerWinsByErrorsColumn = (TableColumn<Player, Integer>) playersTable.getColumns().get(2);
+        TableColumn<Player, Integer> playerLossesColumn = (TableColumn<Player, Integer>) playersTable.getColumns().get(3);
+        TableColumn<Player, Integer> playerLossesByErrorsColumn = (TableColumn<Player, Integer>) playersTable.getColumns().get(4);
 
         playerNameColumn.setStyle("-fx-alignment: CENTER;");
-        playerPointsColumn.setStyle("-fx-alignment: CENTER;");
+        playerWinsColumn.setStyle("-fx-alignment: CENTER;");
+        playerLossesColumn.setStyle("-fx-alignment: CENTER;");
+        playerWinsByErrorsColumn.setStyle("-fx-alignment: CENTER;");
+        playerLossesByErrorsColumn.setStyle("-fx-alignment: CENTER;");
 
         TableColumn<Match, String> player1Column = (TableColumn<Match, String>) matchTable.getColumns().get(0);
         TableColumn<Match, String> player2Column = (TableColumn<Match, String>) matchTable.getColumns().get(1);
@@ -124,7 +131,10 @@ public class DataWindowController {
         resultColumn.setStyle("-fx-alignment: CENTER;");
 
         playerNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        playerPointsColumn.setCellValueFactory(new PropertyValueFactory<>("score"));
+        playerWinsColumn.setCellValueFactory(new PropertyValueFactory<>("scoreDefault"));
+        playerWinsByErrorsColumn.setCellValueFactory(new PropertyValueFactory<>("scoreError"));
+        playerLossesColumn.setCellValueFactory(new PropertyValueFactory<>("lostFromDefault"));
+        playerLossesByErrorsColumn.setCellValueFactory(new PropertyValueFactory<>("lostFromErrors"));
 
         player1Column.setCellValueFactory(p -> {
             if (p.getValue() != null) {
@@ -251,8 +261,10 @@ public class DataWindowController {
             bw.write(sb.toString());
             sb.setLength(0);
             for (Player p : playerList) {
-                //TODO adjust to new score counting
-                sb.append(p.getName()).append(" : ").append(p.getScoreDefault()).append(System.lineSeparator());
+                sb.append("NAME : WINS : WINS BY ERRORS : LOSSES : LOSSES BY ERRORS").append(System.lineSeparator());
+                sb.append(p.getName()).append(" : ").append(p.getScoreDefault())
+                        .append(" : ").append(p.getScoreError()).append(" : ").append(p.getLostFromDefault())
+                        .append(" : ").append(p.getLostFromErrors()).append(System.lineSeparator());
             }
             bw.write(sb.toString());
             bw.write(System.lineSeparator() + "Matches" + System.lineSeparator() + System.lineSeparator());

@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -41,12 +40,6 @@ public class JudgeApplicationTests {
      */
     @Test
     public void canRunBasicGame() throws IOException, ExecutionException {
-        loaderService.loadPlayers(playersFolder.getFile());
-//        gameService.createGame(possibleMatches.get(0));
-//        while(gameService.nextMove() != null) {}
-//        gameService.getCurrentMatch().toString();
-//        gameService.endMatch();
-        autoGameRunner.runAllGames(10, new File("C:\\Users\\Konrad\\Desktop\\Archive\\Judge\\src\\main\\resources\\obstacles.txt"));
     }
 
 }
