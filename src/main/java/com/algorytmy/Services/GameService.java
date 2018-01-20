@@ -32,6 +32,10 @@ public class GameService {
     @Autowired
     LoaderService loaderService;
 
+    private final ExecutorService playersThreadPool =
+            new ThreadPoolExecutor(1, 2, 0L, TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<Runnable>(2000));
+
     @Value("${game.initialdelay}")
     Integer initialdelay;
 
@@ -231,12 +235,12 @@ public class GameService {
         player.getPlayerExecutable().getWriter().flush();
         String line = "";
         Scanner scanner = new Scanner(player.getPlayerExecutable().getProcess().getInputStream());
-        ExecutorService executor = Executors.newFixedThreadPool(1);
+//        ExecutorService executor = Executors.newFixedThreadPool(1);
         int timeLimit = 500;
         if(isFirstMove) {
             timeLimit = initialdelay;
         }
-        Future<String> future = executor.submit(() -> scanner.nextLine());
+        Future<String> future = playersThreadPool.submit(() -> scanner.nextLine());
         try {
             line = future.get(timeLimit, TimeUnit.SECONDS);
         } catch (InterruptedException | java.util.concurrent.ExecutionException | TimeoutException e1) {
