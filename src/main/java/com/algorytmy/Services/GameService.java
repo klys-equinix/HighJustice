@@ -191,7 +191,7 @@ public class GameService {
 
     private boolean noFreeSpaceLeft() {
         for(int i = 0; i < currentMatch.getBoard().length; i++) {
-            for(int j = 0; i < currentMatch.getBoard().length; i++) {
+            for(int j = 0; j < currentMatch.getBoard().length; j++) {
                 if(i + 1 < currentMatch.getBoard().length && currentMatch.getBoard()[i][j].equals(Match.FIELD_VALUE.EMPTY) && currentMatch.getBoard()[i + 1][j].equals(Match.FIELD_VALUE.EMPTY)) {
                     return false;
                 }
