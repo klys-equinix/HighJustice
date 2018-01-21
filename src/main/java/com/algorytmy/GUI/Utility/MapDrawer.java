@@ -24,8 +24,6 @@ public class MapDrawer {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
                 g.setColor(getEntityColor(board[i][j]));
-                if(board[i][j] == Match.FIELD_VALUE.P1)
-                    System.out.println("P1");
                 g.fillRect(i*2, j*2, 1, 1);
             }
         }
