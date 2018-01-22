@@ -32,9 +32,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Optional;
+import java.util.*;
 
 @FXMLController
 public class DataWindowController {
@@ -240,6 +238,7 @@ public class DataWindowController {
 
                 playerList.clear();
                 playerList.addAll(playerRepository.findAll());
+                playerList.sort(Comparator.comparingInt(Player::getScoreDefault).reversed());
             });
         }
     }
@@ -256,15 +255,17 @@ public class DataWindowController {
         try {
             bw = new BufferedWriter(new FileWriter(dir));
             sb.append("Tournament at ").append(Calendar.getInstance().getTime())
-                    .append(System.lineSeparator()).append(System.lineSeparator()).append("Players : Points")
                     .append(System.lineSeparator()).append(System.lineSeparator());
             bw.write(sb.toString());
             sb.setLength(0);
-            for (Player p : playerList) {
-                sb.append("NAME : WINS : WINS BY ERRORS : LOSSES : LOSSES BY ERRORS").append(System.lineSeparator());
+            sb.append("Name : Wins (errors) : Losses (errors) : Matches").append(System.lineSeparator())
+                    .append(System.lineSeparator());
+            List<Player> sortedList = playerList.sorted(Comparator.comparingInt(Player::getScoreDefault).reversed());
+            for (Player p : sortedList) {
                 sb.append(p.getName()).append(" : ").append(p.getScoreDefault())
-                        .append(" : ").append(p.getScoreError()).append(" : ").append(p.getLostFromDefault())
-                        .append(" : ").append(p.getLostFromErrors()).append(System.lineSeparator());
+                        .append(" (").append(p.getScoreError()).append(") : ").append(p.getLostFromDefault())
+                        .append(" (").append(p.getLostFromErrors()).append(") : ")
+                        .append((sortedList.size() - 1) * 2).append(System.lineSeparator());
             }
             bw.write(sb.toString());
             bw.write(System.lineSeparator() + "Matches" + System.lineSeparator() + System.lineSeparator());
